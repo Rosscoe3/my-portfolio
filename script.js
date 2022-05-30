@@ -58,6 +58,52 @@ function controlSetup()
     }
 }
 
+var RESOURCES_LOADED = false;
+
+//** LOAD MANAGER */
+const manager = new THREE.LoadingManager();
+manager.onStart = function (url, itemsLoaded, itemsTotal) {
+  console.log(
+    "Started loading file: " +
+      url +
+      ".\nLoaded " +
+      itemsLoaded +
+      " of " +
+      itemsTotal +
+      " files."
+  );
+};
+manager.onLoad = function () {
+  console.log("Loading complete!");
+  RESOURCES_LOADED = true;
+  document.querySelector(".progress").classList.toggle("disabled");
+  document.querySelector(".progressContainer").classList.toggle("disabled");
+};
+manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+  // console.log(
+  //   "Loading file: " +
+  //     url +
+  //     ".\nLoaded " +
+  //     itemsLoaded +
+  //     " of " +
+  //     itemsTotal +
+  //     " files."
+  // );
+
+  var progress = (itemsTotal / itemsLoaded) * 100;
+  //console.log("Progress: " + progress);
+
+  //Prevent from going over 100%
+  if (progress > 100.0) {
+    progress = 100.0;
+  }
+
+  document.querySelector(".progress__fill").style.width = progress + "%";
+};
+manager.onError = function (url) {
+  console.log("There was an error loading " + url);
+};
+
 // Materials
 const material = new THREE.MeshBasicMaterial({wireframe: true})
 const focismaterial = new THREE.MeshBasicMaterial({wireframe: true, transparent: true})
@@ -190,7 +236,7 @@ function init()
 
     //** 3d OBJECTS */
     //** GTLF LOADER AND ANIMATIONS */
-    var loader = new GLTFLoader();
+    var loader = new GLTFLoader(manager);
 
     loader.load( '/models/IcePlanet.glb', function ( gltf ) {
         //scene.add(gltf.scene);
@@ -317,7 +363,7 @@ function init()
     scene.add(icyPlanet);
     
     //** HDRI LOADER */
-    const rgbeLoader = new RGBELoader();
+    const rgbeLoader = new RGBELoader(manager);
     rgbeLoader.load('/hdri/spaceHdri.hdr', function(texture){
         texture.mapping = THREE.EquirectangularReflectionMapping;
         scene.background = texture;
@@ -335,10 +381,6 @@ function init()
     squareVideo.play();
 }
 
-/**
- * Animate
- */
-
 function scrollWindow() {
     const t = document.body.getBoundingClientRect().top;
     //camera.position.y = .001 * -t;
@@ -347,7 +389,7 @@ function scrollWindow() {
     let currentTimeline = window.pageYOffset / 3000;
 
 
-    console.log(currentTimeline);
+    //console.log(currentTimeline);
 
     //camera.position.z = t * -0.01;
     //camera.position.x = t * -0.0002;
@@ -565,7 +607,7 @@ function animate()
     tallVideoTexture.needsUpdate = true;
     squareVideoTexture.needsUpdate = true;
 
-    console.log(camera.rotation);
+    //console.log(camera.rotation);
     //console.log("ROT: " + camera.rotation);
 
     //lessonCameraMove();

@@ -24,7 +24,7 @@ body
     top: 0;
     left: 0;
     outline: none;
-    mix-blend-mode: difference;
+    /* mix-blend-mode: difference; */
 }
 
 .container {
@@ -66,3 +66,46 @@ section {
     opacity: 50%;
     transition: opacity 0.25s;
 }
+
+.progressContainer{
+    position: absolute;
+    width: 100vw;
+    height: 100%;
+    background-color: black;
+    color: black;
+    opacity: 100%;
+    left: 0px;
+    top: 0px;
+    mix-blend-mode: normal;
+}
+
+.progressContainer.disabled{
+    opacity: 0%;
+    pointer-events: none;
+    transition: all 500ms ease-in-out;
+}
+
+.progress {
+    position: absolute;
+    left: 50vh;
+    top: 50vh;
+    width: 50vw;
+    height: 1vh;
+    z-index: 100;
+    opacity: 100%;
+  }
+  
+  .progress__fill{
+    width: 60%;
+    height: 100%;
+    background: white;
+    border-radius: 10px;
+    opacity: 100%;
+    transition: all 500ms ease-in-out;
+  }
+  
+  .progress.disabled{
+    opacity: 0%;
+    pointer-events: none;
+    transition: all 500ms ease-in-out;
+  }
