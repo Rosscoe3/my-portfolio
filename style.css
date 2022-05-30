@@ -1,0 +1,68 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+:root{
+    --min-height: calc(3000px + 100vh);
+}
+
+html,
+body
+{
+    height: 100vw;
+    font-family: roboto-condensed, sans-serif;
+    background: rgb(10, 10, 10);
+    min-height: var(--min-height);
+    overflow-x: hidden;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+    mix-blend-mode: difference;
+}
+
+.container {
+    position: relative;
+    top: calc(50vh - 10vw);
+    height: calc(var(--min-height) - 50vh + 10vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+h1 {
+    font-size: 10vw;
+    text-transform: uppercase;
+    color: rgb(255, 255, 255);
+}
+
+section {
+    height: 100vh;
+}
+
+.title
+{
+    position: absolute;
+    top: 5vh;
+    right: 1.5vh;
+    opacity: 100%;
+    pointer-events: auto;
+
+    font-size: 5vh;
+    color: white;
+
+    transition: opacity 0.25s;
+}
+
+.title:hover
+{
+    opacity: 50%;
+    transition: opacity 0.25s;
+}
