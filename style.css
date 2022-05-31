@@ -4,17 +4,12 @@
     padding: 0;
 }
 
-:root{
-    --min-height: calc(3000px + 100vh);
-}
-
 html,
 body
 {
-    height: 100vw;
+    height: 100vh;
     font-family: roboto-condensed, sans-serif;
     background: rgb(10, 10, 10);
-    min-height: var(--min-height);
     overflow-x: hidden;
 }
 
@@ -25,16 +20,6 @@ body
     left: 0;
     outline: none;
     /* mix-blend-mode: difference; */
-}
-
-.container {
-    position: relative;
-    top: calc(50vh - 10vw);
-    height: calc(var(--min-height) - 50vh + 10vw);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
 }
 
 h1 {
@@ -50,7 +35,7 @@ section {
 .title
 {
     position: absolute;
-    top: 5vh;
+    top: 1vh;
     right: 1.5vh;
     opacity: 100%;
     pointer-events: auto;
@@ -67,7 +52,76 @@ section {
     transition: opacity 0.25s;
 }
 
+.navigation{
+    position: absolute;
+    
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+    grid-template-areas: 
+    "nav nav nav nav nav";
+    
+    max-width: 80vh;
+    max-height: 80vh;
+    /* padding: 20px;
+    gap: 20vw; */
+
+    
+    width: 60%;
+    bottom: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+
+    justify-content: center;
+    
+    gap: 20px;
+    transition: all 500ms ease-in-out;
+}
+
+.navigation .nav{
+
+    height: 3.5vh;
+    width: 7vh;
+    border-radius: 10%;
+
+    font-family: roboto-condensed, sans-serif;
+
+    color: white;
+    background-color:null;
+    outline: auto;
+    mix-blend-mode: difference;
+    transition: all 500ms ease-in-out;
+}
+
+.navigation .nav:hover
+{
+    background-color:white;
+}
+
+.navTitle{
+    border-radius: 10%;
+    grid-template-areas: none;
+    position: relative;
+    text-align: center;
+    
+    font-size: 2vh;
+    opacity: 0%;
+    color: white;
+    top: -100%;
+    transition: all 500ms ease-in-out;
+}
+
+.navigation .nav:hover > .navTitle 
+{ 
+    opacity: 100%;
+    transition: all 500ms ease-in-out;
+}
+
 .progressContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     position: absolute;
     width: 100vw;
     height: 100%;
@@ -87,12 +141,11 @@ section {
 
 .progress {
     position: absolute;
-    left: 50vh;
-    top: 50vh;
     width: 50vw;
     height: 1vh;
     z-index: 100;
     opacity: 100%;
+    transition: all 500ms ease-in-out;
   }
   
   .progress__fill{

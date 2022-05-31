@@ -607,6 +607,9 @@ function animate()
     tallVideoTexture.needsUpdate = true;
     squareVideoTexture.needsUpdate = true;
 
+    //scene.enviroment.rotation += Math.PI;
+    //scene.enviroment = texture;
+
     //console.log(camera.rotation);
     //console.log("ROT: " + camera.rotation);
 
