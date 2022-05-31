@@ -68,13 +68,14 @@ section {
 
     
     width: 60%;
-    bottom: 5%;
+    bottom: 2.5%;
     left: 50%;
     transform: translate(-50%, -50%) scale(1);
 
     justify-content: center;
+    align-items: center;
     
-    gap: 20px;
+    /* gap: 20px; */
     transition: all 500ms ease-in-out;
 }
 
@@ -83,6 +84,7 @@ section {
     height: 3.5vh;
     width: 7vh;
     border-radius: 10%;
+    margin: 0.75vh;
 
     font-family: roboto-condensed, sans-serif;
 
