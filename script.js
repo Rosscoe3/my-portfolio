@@ -5,6 +5,8 @@ import { OrbitControls } from 'https://cdn.skypack.dev/three@0.127.0/examples/js
 // import * as dat from 'dat.gui'
 import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/loaders/RGBELoader.js';
+import { EffectComposer } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/RenderPass.js';
 import * as TWEEN from 'https://cdn.skypack.dev/@tweenjs/tween.js'
 
 // import * as THREE from 'three';
@@ -32,8 +34,13 @@ const mainCamera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0
 const controls = new OrbitControls(camera, canvas)
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    alpha: true
-})
+    alpha: false, 
+    antialias: true,
+    alphaBuffer: false,
+    depth: false,
+    powerPreference: "high-performance"
+});
+const composer = new EffectComposer(renderer);
 
 controlSetup();
 function controlSetup()
@@ -184,6 +191,17 @@ var tallMovieMaterial = new THREE.MeshBasicMaterial({
     transparent: true
 });
 
+let tallVideo2 = document.getElementById("video3");
+let tallVideo2Texture = new THREE.VideoTexture(tallVideo2);
+tallVideo2Texture.minFilter = THREE.LinearFilter;
+tallVideo2Texture.magFilter = THREE.LinearFilter;
+var tallMovie2Material = new THREE.MeshBasicMaterial({
+    map: tallVideo2Texture, 
+    side: THREE.FrontSide, 
+    toneMapped: false,
+    transparent: true
+});
+
 
 
 //** DRAW A LINE */
@@ -216,7 +234,7 @@ function init()
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 7.5;
+    //renderer.toneMappingExposure = 1.5;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     //controls.target.y = 1;
@@ -268,7 +286,7 @@ function init()
         });
     });
     
-    loader.load( '/models/Space-dreams-portfolio.glb', function ( gltf ) {
+    loader.load( '/models/Space-dreams-portfolio-update-3.glb', function ( gltf ) {
         //scene.add(gltf.scene);
 
         gltf.animations; // Array<THREE.AnimationClip>
@@ -312,6 +330,18 @@ function init()
             o.children[0].material.map.flipY = false;
         }
         else if (o.name == "SCREEN-FRAME-2")
+        {
+            console.log(o.children);
+            o.children[0].material = tallMovieMaterial;
+            o.children[0].material.map.flipY = false;
+        }
+        else if (o.name == "SCREEN-FRAME-2002")
+        {
+            console.log(o.children);
+            o.children[0].material = tallMovie2Material;
+            o.children[0].material.map.flipY = false;
+        }
+        else if (o.name == "SCREEN-FRAME-2001")
         {
             console.log(o.children);
             o.children[0].material = tallMovieMaterial;
@@ -606,6 +636,7 @@ function animate()
     //Video Textures
     tallVideoTexture.needsUpdate = true;
     squareVideoTexture.needsUpdate = true;
+    //console.log(renderer.info);
 
     //scene.enviroment.rotation += Math.PI;
     //scene.enviroment = texture;
