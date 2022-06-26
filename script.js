@@ -8,6 +8,7 @@ import { RGBELoader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/l
 import { EffectComposer } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/RenderPass.js';
 import * as TWEEN from 'https://cdn.skypack.dev/@tweenjs/tween.js'
+import {CSS3DRenderer, CSS3DObject} from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/renderers/CSS3DRenderer.js';
 
 // import * as THREE from 'three';
 // import { OrbitControls } from 'OrbitControls'
@@ -21,6 +22,7 @@ import * as TWEEN from 'https://cdn.skypack.dev/@tweenjs/tween.js'
 //** CANVAS AND SCENE */
 const canvas = document.querySelector('canvas.webgl');
 const scene = new THREE.Scene();
+const cssScene = new THREE.Scene();
 //scene.background = new THREE.Color("#ffffff");
 
 //** SCREEN */
@@ -40,12 +42,41 @@ const renderer = new THREE.WebGLRenderer({
     depth: false,
     powerPreference: "high-performance"
 });
+
+//** CSS3dRENDERER AND ELEMENT FUNCTION */
+var Element = function ( id, x, y, z, ry ) {
+    var div = document.createElement( 'div' );
+    div.style.width = '1920px';
+    div.style.height = '1080px';
+    div.style.backgroundColor = '#000';
+    var iframe = document.createElement( 'iframe' );
+    iframe.style.width = '1920px';
+    iframe.style.height = '1080px';
+    iframe.style.border = '0px';
+    iframe.src = [ 'https://www.youtube.com/embed/', id, '?rel=0&autoplay=1&mute=1' ].join( '' );
+    div.appendChild( iframe );
+    var object = new CSS3DObject( div );
+    object.position.set( x, y, z );
+    object.rotation.y = ry;
+    object.scale.set(0.001, 0.001, 0.001);
+    return object;
+};
+
+const cssRenderer = new CSS3DRenderer();
+cssRenderer.domElement.style.position = 'absolute';
+cssRenderer.domElement.style.top = 0;
+cssRenderer.setSize( window.innerWidth, window.innerHeight );
+document.getElementById('css').appendChild(cssRenderer.domElement);
+
+//** EFFECT COMPOSER */
 const composer = new EffectComposer(renderer);
+
+
 
 controlSetup();
 function controlSetup()
 {
-    controls.minDistance = 2.0;
+    controls.minDistance = 1.0;
     controls.maxDistance = 3.0;
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
@@ -126,7 +157,7 @@ const sphere = new THREE.Mesh(geometry,material);
 const focusBox = new THREE.Mesh(geometry, focismaterial);
 var cameraFocus = new THREE.Object3D();
 var planetHologram, planetHologramChild, planetHologramChild2;
-var mug, screenFrame;
+var mug, screenFrame, aboutScreen, portfolioScreen;
 
 //** VARIOUS VARIABLES */
 document.body.onscroll = scrollWindow
@@ -191,17 +222,16 @@ var tallMovieMaterial = new THREE.MeshBasicMaterial({
     transparent: true
 });
 
-let tallVideo2 = document.getElementById("video3");
-let tallVideo2Texture = new THREE.VideoTexture(tallVideo2);
-tallVideo2Texture.minFilter = THREE.LinearFilter;
-tallVideo2Texture.magFilter = THREE.LinearFilter;
-var tallMovie2Material = new THREE.MeshBasicMaterial({
-    map: tallVideo2Texture, 
+let aboutVideo = document.getElementById("aboutVid");
+let aboutVideoTexture = new THREE.VideoTexture(aboutVideo);
+aboutVideoTexture.minFilter = THREE.LinearFilter;
+aboutVideoTexture.magFilter = THREE.LinearFilter;
+var aboutMovieMaterial = new THREE.MeshBasicMaterial({
+    map: aboutVideoTexture, 
     side: THREE.FrontSide, 
     toneMapped: false,
     transparent: true
 });
-
 
 
 //** DRAW A LINE */
@@ -224,17 +254,20 @@ init();
 
 function init()
 {
-
     //** CAMERA && Contrls*/
-    camera.position.x = -0.78;
-    camera.position.y = 0.44;
-    camera.position.z = -2.4;
+    // camera.position.x = -0.78;
+    // camera.position.y = 0.44;
+    // camera.position.z = -2.4;
+    camera.position.set( -0.78, 0.44, -2.4 );
     //scene.add(camera);
+
+    cssRenderer.setSize(sizes.width, sizes.height);
+    //document.body.appendChild(cssRenderer.domElement);
 
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    //renderer.toneMappingExposure = 1.5;
+    renderer.toneMappingExposure = 1.5;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     //controls.target.y = 1;
@@ -248,14 +281,12 @@ function init()
     pointLight.position.z = icyPlanet.position.z;
     //scene.add(pointLight)
     //scene.add(hemisphereLight);
-    scene.add( directionalLight );
-
     directionalLight.target = new THREE.Object3D( 100, 1, -30 );
+    scene.add( directionalLight );
 
     //** 3d OBJECTS */
     //** GTLF LOADER AND ANIMATIONS */
     var loader = new GLTFLoader(manager);
-
     loader.load( '/models/IcePlanet.glb', function ( gltf ) {
         //scene.add(gltf.scene);
 
@@ -285,8 +316,7 @@ function init()
             }
         });
     });
-    
-    loader.load( '/models/Space-dreams-portfolio-update-3.glb', function ( gltf ) {
+    loader.load( '/models/Space-dreams-portfolio-update-4.glb', function ( gltf ) {
         //scene.add(gltf.scene);
 
         gltf.animations; // Array<THREE.AnimationClip>
@@ -329,22 +359,27 @@ function init()
             o.children[0].material = squareMovieMaterial;
             o.children[0].material.map.flipY = false;
         }
+        //** COFFEE SCREEN */
         else if (o.name == "SCREEN-FRAME-2")
         {
             console.log(o.children);
             o.children[0].material = tallMovieMaterial;
             o.children[0].material.map.flipY = false;
         }
+        //** PORTFOLIO SCREEN */
         else if (o.name == "SCREEN-FRAME-2002")
         {
-            console.log(o.children);
-            o.children[0].material = tallMovie2Material;
-            o.children[0].material.map.flipY = false;
+            // o.children[0].material = tallMovieMaterial;
+            // o.children[0].material.map.flipY = false;
+            portfolioScreen = o;
+            console.log(o.position);
         }
+        //** ABOUT SCREEN */
         else if (o.name == "SCREEN-FRAME-2001")
         {
             console.log(o.children);
-            o.children[0].material = tallMovieMaterial;
+            aboutScreen = o;
+            o.children[0].material = aboutMovieMaterial;
             o.children[0].material.map.flipY = false;
         }
 
@@ -390,7 +425,7 @@ function init()
     //icyPlanet.updateMatrixWorld(true);
     icyPlanet.position.set(1, 1, 100);
     icyPlanet.scale.set(10, 10, 10);
-    scene.add(icyPlanet);
+    //scene.add(icyPlanet);
     
     //** HDRI LOADER */
     const rgbeLoader = new RGBELoader(manager);
@@ -401,13 +436,25 @@ function init()
         console.log("LOADED IMAGE");
     });
 
+    //** YOUTUBE VIDEO POSITION */
+    var group = new THREE.Group();
+    var portfolioPlay = new Element( 'jtmlqDiMyII', -4.026, 0.79, -6.25, 0 );
+    portfolioPlay.scale.set(.00076, .00076, .00076);
+	group.add(portfolioPlay);
+    cssScene.add( group );
 
+    // add it to the css scene
+    
+    //cssObject.position.set(portfolioScreen.position);
+    //cssObject.rotation.set(portfolioScreen.rotation);
+    //cssScene.add(cssObject);
 
-    //scene.add(focusBox);
+    scene.add(focusBox);
     focusBox.scale.set(0.1, 0.1, 0.1);
     renderer.domElement.addEventListener("click", onclick, true);
 
     tallVideo.play();
+    aboutVideo.play();
     squareVideo.play();
 }
 
@@ -526,6 +573,34 @@ function lessonCameraMove(index)
         camTween2.onComplete(cameraMoveComplete);
         viewIndex = 2;
     }
+    else if(index == 3)
+    {
+        const camTween = new TWEEN.Tween(focusBox.position).to(
+            {
+            x: aboutScreen.position.x,
+            y: aboutScreen.position.y,
+            z: aboutScreen.position.z
+            },
+            5000
+        ).easing(TWEEN.Easing.Quadratic.Out)
+        .start();
+        camTween.onComplete(cameraMoveComplete);
+        viewIndex = 3;
+    }
+    else if(index == 4)
+    {
+        const camTween = new TWEEN.Tween(focusBox.position).to(
+            {
+            x: portfolioScreen.position.x,
+            y: portfolioScreen.position.y,
+            z: portfolioScreen.position.z
+            },
+            5000
+        ).easing(TWEEN.Easing.Quadratic.Out)
+        .start();
+        camTween.onComplete(cameraMoveComplete);
+        viewIndex = 4;
+    }
 }
 
 function cameraMoveComplete()
@@ -555,6 +630,14 @@ function cameraMoveComplete()
 
         controls.minAzimuthAngle = Math.PI * -1.65;
         controls.maxAzimuthAngle = Math.PI * 0.9;
+    }
+    else if(viewIndex == 4)
+    {
+        controls.minPolarAngle = Math.PI/2.5;
+        controls.maxPolarAngle = Math.PI/1.5;
+
+        controls.minAzimuthAngle = Math.PI * -0.25;
+        controls.maxAzimuthAngle = Math.PI * 0.3;
     }
 }
 
@@ -603,7 +686,8 @@ const tick = () =>
     controls.update()
 
     // Render
-    renderer.render(scene, camera)
+    renderer.render(scene, camera);
+    cssRenderer.render(cssScene, camera);
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
@@ -632,6 +716,7 @@ function animate()
     if ( mixer ) mixer.update( delta );
 
     renderer.render( scene, camera );
+    cssRenderer.render(cssScene, camera);
 
     //Video Textures
     tallVideoTexture.needsUpdate = true;
@@ -647,6 +732,21 @@ function animate()
     //lessonCameraMove();
 }
 
+//** BLOCKER FOR YOUTUBE VIDEOS */
+var blocker = document.getElementById( 'blocker' );
+blocker.style.display = 'none';
+document.addEventListener( 'mousedown', function () {
+    
+    blocker.style.display = '';
+    
+} );
+document.addEventListener( 'mouseup', function () {
+    blocker.style.display = 'none';
+} );
+
+window.addEventListener("mousemove", function (event) {
+    onMouseMove(event);
+});
 window.addEventListener('resize', () =>
 {
     // Update sizes
@@ -660,12 +760,9 @@ window.addEventListener('resize', () =>
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
 
-window.addEventListener("mousemove", function (event) {
-    onMouseMove(event);
-  });
-
+    cssRenderer.setSize(sizes.width, sizes.height);
+});
 portfolioButton.addEventListener("click", function (ev) {
   ev.stopPropagation(); // prevent event from bubbling up to .container
   console.log("PORTFOIO");
@@ -677,14 +774,14 @@ unityButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
     console.log("UNITY");
   
-    lessonCameraMove(1);
+    lessonCameraMove(3);
   });
 
 blenderButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
     console.log("UNITY");
 
-    lessonCameraMove(2);
+    lessonCameraMove(4);
 });
 
 
