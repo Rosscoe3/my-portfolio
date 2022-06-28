@@ -9,6 +9,7 @@ import { EffectComposer } from 'https://cdn.skypack.dev/three@0.127.0/examples/j
 import { RenderPass } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/RenderPass.js';
 import * as TWEEN from 'https://cdn.skypack.dev/@tweenjs/tween.js'
 import {CSS3DRenderer, CSS3DObject} from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/renderers/CSS3DRenderer.js';
+import * as dat from 'https://cdn.skypack.dev/dat.gui';
 
 // import * as THREE from 'three';
 // import { OrbitControls } from 'OrbitControls'
@@ -44,7 +45,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 //** CSS3dRENDERER AND ELEMENT FUNCTION */
-var Element = function ( id, x, y, z, ry ) {
+var Element = function ( id, x, y, z, ry , divId) {
     var div = document.createElement( 'div' );
     div.style.width = '1920px';
     div.style.height = '1080px';
@@ -54,6 +55,8 @@ var Element = function ( id, x, y, z, ry ) {
     iframe.style.height = '1080px';
     iframe.style.border = '0px';
     iframe.src = [ 'https://www.youtube.com/embed/', id, '?rel=0&autoplay=1&mute=1' ].join( '' );
+    iframe.id = "animationYoutubeVideo";
+
     div.appendChild( iframe );
     var object = new CSS3DObject( div );
     object.position.set( x, y, z );
@@ -71,8 +74,6 @@ document.getElementById('css').appendChild(cssRenderer.domElement);
 //** EFFECT COMPOSER */
 const composer = new EffectComposer(renderer);
 
-
-
 controlSetup();
 function controlSetup()
 {
@@ -83,11 +84,11 @@ function controlSetup()
 
     controls.screenSpacePanning = true;
 
-    // controls.minPolarAngle = Math.PI/3;
-    // controls.maxPolarAngle = Math.PI/1.75;
+    controls.minPolarAngle = Math.PI/3;
+    controls.maxPolarAngle = Math.PI/2;
 
-    // controls.minAzimuthAngle = Math.PI * -1.25;
-    // controls.maxAzimuthAngle = Math.PI * 1;
+    controls.minAzimuthAngle = Math.PI * -1.5;
+    controls.maxAzimuthAngle = Math.PI * 1.5;
 
     controls.mouseButtons = {
         LEFT: THREE.MOUSE.ROTATE,
@@ -144,7 +145,7 @@ manager.onError = function (url) {
 
 // Materials
 const material = new THREE.MeshBasicMaterial({wireframe: true})
-const focismaterial = new THREE.MeshBasicMaterial({wireframe: true, transparent: true})
+const focismaterial = new THREE.MeshBasicMaterial({wireframe: true, transparent: true, opacity: "0%"})
 material.color = new THREE.Color(0xffffff)
 
 // Mesh
@@ -165,6 +166,9 @@ const clock = new THREE.Clock()
 var mixer;
 var orbit1Index = 0;
 var mouse = new THREE.Vector2();
+var raycaster = new THREE.Raycaster();
+var intersects, intersectObject;
+var intersected = false;
 var viewIndex = 0;
 
 // Lights
@@ -183,6 +187,16 @@ scene.add( light );
 const planeGeometry = new THREE.PlaneGeometry( 10, 10 );
 const material1 = new THREE.MeshBasicMaterial( {color: 0xffffff, side: THREE.DoubleSide} );
 const plane = new THREE.Mesh( planeGeometry, material1 );
+const aboutboxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
+const resumeBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
+const artStationBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
+const linkedInBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
+const contactBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
+
+const resumeBox = new THREE.Mesh(geometry, resumeBoxMaterial);
+const artStationBox = new THREE.Mesh(geometry, artStationBoxMaterial);
+const linkedInBox = new THREE.Mesh(geometry, linkedInBoxMaterial);
+const contactBox = new THREE.Mesh(geometry, contactBoxMaterial);
 plane.rotation.x = Math.PI / 2;
 plane.position.y = -1;
 //scene.add( plane );
@@ -198,10 +212,12 @@ var planets;
 var tween, camTween;
 
 //** HTML REFERENCES **/
-let portfolioButton = document.getElementById("porfolioButton");
-let unityButton = document.getElementById("unityButton");
-let blenderButton = document.getElementById("blenderButton");
+let animationButton = document.getElementById("animation");
+let interactivesButton = document.getElementById("interactives");
+let aboutButton = document.getElementById("about");
+let titleButton = document.getElementById("title");
 let squareVideo = document.getElementById("video");
+
 let squareVideoTexture = new THREE.VideoTexture(squareVideo);
 //squareVideoTexture.minFilter = THREE.LinearFilter;
 //squareVideoTexture.magFilter = THREE.LinearFilter;
@@ -283,6 +299,33 @@ function init()
     //scene.add(hemisphereLight);
     directionalLight.target = new THREE.Object3D( 100, 1, -30 );
     scene.add( directionalLight );
+
+    //** ABOUT CLICKABLE LINKS */
+
+    resumeBox.name = 'resume';
+    artStationBox.name = 'photo';
+    linkedInBox.name = 'creative technologist';
+    contactBox.name = 'contact';
+
+    resumeBox.userdata = "asdf";
+    artStationBox.userdata = "https://www.artstation.com/rosscoe3/";
+    linkedInBox.userdata = "https://www.linkedin.com/in/ross-walter-0043bb211/";
+    contactBox.userdata = "https://www.linkedin.com/in/ross-walter-0043bb211/overlay/contact-info/";
+    
+    resumeBox.scale.set(0.1, 0.075, 0.28);
+    artStationBox.scale.set(0.1, 0.55, 0.55);
+    linkedInBox.scale.set(0.1, 0.2, 0.55);
+    contactBox.scale.set(0.1, 0.075, 0.3);
+    
+    resumeBox.position.set(4.93, 0.426, -0.44);
+    artStationBox.position.set(4.93, 1.009, -0.288);
+    linkedInBox.position.set(4.93, 0.619, -0.31);
+    contactBox.position.set(4.93, 0.31, 0);
+    
+    scene.add(resumeBox);
+    scene.add(artStationBox);
+    scene.add(linkedInBox);
+    scene.add(contactBox);
 
     //** 3d OBJECTS */
     //** GTLF LOADER AND ANIMATIONS */
@@ -381,6 +424,7 @@ function init()
             aboutScreen = o;
             o.children[0].material = aboutMovieMaterial;
             o.children[0].material.map.flipY = false;
+            //resumeBox.position.set(aboutScreen.position.x, aboutScreen.position.y, aboutScreen.position.z);
         }
 
         else if(o.name == "Sphere")
@@ -425,7 +469,7 @@ function init()
     //icyPlanet.updateMatrixWorld(true);
     icyPlanet.position.set(1, 1, 100);
     icyPlanet.scale.set(10, 10, 10);
-    //scene.add(icyPlanet);
+    scene.add(icyPlanet);
     
     //** HDRI LOADER */
     const rgbeLoader = new RGBELoader(manager);
@@ -442,6 +486,13 @@ function init()
     portfolioPlay.scale.set(.00076, .00076, .00076);
 	group.add(portfolioPlay);
     cssScene.add( group );
+
+    // var youtubeVid2 = new THREE.Group();
+    // var ytVid2 = new Element( 'jtmlqDiMyII', -7.93, 0.489, -0.54, 0);
+    // ytVid2.scale.set(.00076, .00076, .00076);
+    // ytVid2.rotation.y += 90;
+	// youtubeVid2.add(ytVid2);
+    // cssScene.add( youtubeVid2 );
 
     // add it to the css scene
     
@@ -607,6 +658,7 @@ function cameraMoveComplete()
 {
     console.log("TWEEN IS DONE");
     
+    //INTERACTIVES//
     if(viewIndex == 0)
     {
         controls.minPolarAngle = 0;
@@ -615,14 +667,16 @@ function cameraMoveComplete()
         controls.minAzimuthAngle = Infinity;
         controls.maxAzimuthAngle = Infinity;
     }
+    //MAIN TITLE//
     else if(viewIndex == 1)
     {
         controls.minPolarAngle = Math.PI/3;
-        controls.maxPolarAngle = Math.PI/1.75;
+        controls.maxPolarAngle = Math.PI/2;
 
-        controls.minAzimuthAngle = Math.PI * -1.25;
-        controls.maxAzimuthAngle = Math.PI * 1;
-    } 
+        controls.minAzimuthAngle = Math.PI * -1.5;
+        controls.maxAzimuthAngle = Math.PI * 1.5;
+    }
+    //**INTERACTIVE */ 
     else if(viewIndex == 2)
     {
         controls.minPolarAngle = Math.PI/2.5;
@@ -631,6 +685,16 @@ function cameraMoveComplete()
         controls.minAzimuthAngle = Math.PI * -1.65;
         controls.maxAzimuthAngle = Math.PI * 0.9;
     }
+    //**ABOUT SCREEN */
+    else if(viewIndex == 3)
+    {
+        controls.minPolarAngle = Math.PI/2.5;
+        controls.maxPolarAngle = Math.PI/1.65;
+
+        controls.minAzimuthAngle = Math.PI * 1.1;
+        controls.maxAzimuthAngle = Math.PI * 1.6;
+    }
+    //**ANIMATION SCREEN */ 
     else if(viewIndex == 4)
     {
         controls.minPolarAngle = Math.PI/2.5;
@@ -640,6 +704,93 @@ function cameraMoveComplete()
         controls.maxAzimuthAngle = Math.PI * 0.3;
     }
 }
+
+function hoverObject() {
+    raycaster.setFromCamera(mouse, camera);
+    intersects = raycaster.intersectObjects(scene.children, true);
+
+    //console.log(intersects[0].object.name);
+
+    if (intersects.length > 0 && intersects[0].object.name == "resume" ||
+    intersects[0].object.name == "photo" || intersects[0].object.name == "creative technologist" || 
+    intersects[0].object.name == "contact")
+    {
+        intersectObject = intersects[0].object;
+        intersected = true;
+        intersectObject.material.opacity = 0.5;
+        intersectObject.material.side = THREE.FrontSide;
+        console.log("On Object");
+        document.body.style.cursor = 'pointer' 
+    }
+    else if(intersects.length > 0 && intersects[0].object.name == "Cube001")
+    {
+        
+    }
+    else
+    {
+        if (intersected) 
+        {
+            console.log("Off Object");
+            intersected = false;
+            intersectObject.material.opacity = 0;
+            intersectObject = null;
+            document.body.style.cursor = 'default'
+        }
+    }
+}
+
+function clickEvent() {
+    var intersects;
+    raycaster.setFromCamera(mouse, camera);
+    intersects = raycaster.intersectObjects(scene.children, true);
+
+    console.log(intersects[0]);
+
+    if(intersects[0])
+    {
+        intersectObject = intersects[0].object;
+
+        if (intersects.length > 0 && 
+        intersects[0].object.name == "photo" || intersects[0].object.name == "creative technologist" || 
+        intersects[0].object.name == "contact")
+        {
+            console.log("clicked about link");
+            clickOpenURL(intersects, intersects[0].object.userdata);
+        }
+        else if(intersects.length > 0 && intersects[0].object.name == "resume")
+        {
+            // Download("/images/Ross Walter - Resume.pdf")''
+            window.open("/images/Ross Walter - Resume.pdf", '_blank');
+        }
+        else if(intersects.length > 0 && intersects[0].object.name == "Cube001")
+        {
+            clickOpenURL(intersects, "https://open.spotify.com/artist/4z8B0p2AoxbT3usRPl1dS7");
+        }
+    }
+}
+
+//** OPENS URLS ON HOVERCLICK */
+function clickOpenURL(intersects, url) 
+{
+    if (intersects.length > 0) 
+    {
+        console.log("CLICK OPEN");
+        //If it has a URL open in another window
+        if (url) 
+        {
+            window.open(url,'_blank');
+            console.log("Opening: " + url + " in a new tab");
+        } 
+        else 
+        {
+            console.log("UI does not have a link");
+        }
+    }
+}
+
+function Download(url) {
+    document.getElementById('my_iframe').src = url;
+};
 
 let v = new THREE.Vector3();
 
@@ -721,6 +872,11 @@ function animate()
     //Video Textures
     tallVideoTexture.needsUpdate = true;
     squareVideoTexture.needsUpdate = true;
+
+    if(RESOURCES_LOADED)
+    {
+        hoverObject();
+    }
     //console.log(renderer.info);
 
     //scene.enviroment.rotation += Math.PI;
@@ -731,6 +887,48 @@ function animate()
 
     //lessonCameraMove();
 }
+
+const gui = new dat.GUI();
+
+const guiWorld = {
+    xPos: {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    rotPos:{
+      x: 0,
+      y: 0, 
+      z: 0,
+    }
+  };
+  
+gui.add(guiWorld.xPos, "x", -1, 1).onChange(() => {
+    resumeBox.position.set(
+    guiWorld.xPos.x,
+    resumeBox.position.y,
+    resumeBox.position.z
+);
+console.log(resumeBox.position);
+});
+
+gui.add(guiWorld.xPos, "y", -1, 2).onChange(() => {
+    resumeBox.position.set(
+        resumeBox.position.x,
+    guiWorld.xPos.y,
+    resumeBox.position.z
+);
+console.log(resumeBox.position);
+});
+
+gui.add(guiWorld.xPos, "z", -1, 1).onChange(() => {
+    resumeBox.position.set(
+        resumeBox.position.x,
+        resumeBox.position.y,
+    guiWorld.xPos.z
+);
+console.log(resumeBox.position);
+});
 
 //** BLOCKER FOR YOUTUBE VIDEOS */
 var blocker = document.getElementById( 'blocker' );
@@ -763,25 +961,49 @@ window.addEventListener('resize', () =>
 
     cssRenderer.setSize(sizes.width, sizes.height);
 });
-portfolioButton.addEventListener("click", function (ev) {
-  ev.stopPropagation(); // prevent event from bubbling up to .container
-  console.log("PORTFOIO");
 
-  lessonCameraMove(0);
+window.addEventListener("click", () => {
+    clickEvent();
 });
 
-unityButton.addEventListener("click", function (ev) {
+titleButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
-    console.log("UNITY");
+    console.log("PORTFOIO");
   
-    lessonCameraMove(3);
+    lessonCameraMove(1);
+
+    //** TURN OFF ANIMATION VIDEO IF ITS ON */
+    if(document.getElementById("animationYoutubeVideo").classList.contains("active"))
+    {
+        document.getElementById("animationYoutubeVideo").classList.toggle("active");
+    }
   });
 
-blenderButton.addEventListener("click", function (ev) {
-    ev.stopPropagation(); // prevent event from bubbling up to .container
-    console.log("UNITY");
+animationButton.addEventListener("click", function (ev) {
+  ev.stopPropagation(); // prevent event from bubbling up to .container
+  console.log("ANIMATION");
 
-    lessonCameraMove(4);
+
+  if(!document.getElementById("animationYoutubeVideo").classList.contains("active"))
+  {
+    document.getElementById("animationYoutubeVideo").classList.toggle("active");
+  }
+
+  lessonCameraMove(4);
+});
+
+interactivesButton.addEventListener("click", function (ev) {
+    ev.stopPropagation(); // prevent event from bubbling up to .container
+    console.log("INTERACTIVE");
+  
+    lessonCameraMove(2);
+  });
+
+aboutButton.addEventListener("click", function (ev) {
+    ev.stopPropagation(); // prevent event from bubbling up to .container
+    console.log("ABOUT");
+
+    lessonCameraMove(3);
 });
 
 

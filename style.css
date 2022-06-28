@@ -40,12 +40,33 @@ section {
     height: 100vh;
 }
 
+.titles{
+    position: absolute;
+    display: grid;
+    /* padding: 20px;
+    gap: 20vw; */
+
+    
+    width: fit-content;
+    height: fit-content;
+    top: 0.5%;
+    left: 1%;
+    /* transform: translate(-50%, -50%) scale(1); */
+
+    /* justify-content: center;
+    align-items: center; */
+    transition: all 500ms ease-in-out;
+}
+
 .title
 {
-    position: absolute;
-    top: 1vh;
-    right: 1.5vh;
+    /* position: absolute; */
+    /* top: 1vh;
+    right: 1.5vh; */
+    mix-blend-mode: difference;
     opacity: 100%;
+    width: fit-content;
+    height: fit-content;
     pointer-events: auto;
 
     font-size: 5vh;
@@ -58,6 +79,15 @@ section {
 {
     opacity: 50%;
     transition: opacity 0.25s;
+}
+
+iframe{
+    opacity: 0%;
+    transition: all 500ms ease-in-out;
+}
+iframe.active{
+    opacity: 100%;
+    transition: all 500ms ease-in-out;
 }
 
 .navigation{
@@ -103,8 +133,7 @@ section {
     transition: all 500ms ease-in-out;
 }
 
-.navigation .nav:hover
-{
+.navigation .nav:hover{
     background-color:white;
 }
 
@@ -126,6 +155,7 @@ section {
     opacity: 100%;
     transition: all 500ms ease-in-out;
 }
+
 
 .progressContainer{
     display: flex;
