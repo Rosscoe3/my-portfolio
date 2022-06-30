@@ -8,9 +8,10 @@ html,
 body
 {
     height: 100vh;
-    font-family: roboto-condensed, sans-serif;
+    font-family: 'Libre Barcode 39 Text', cursive;
     background: rgb(10, 10, 10);
     overflow-x: hidden;
+    /* 'Gugi' */
 }
 
 .webgl
@@ -49,12 +50,12 @@ section {
     
     width: fit-content;
     height: fit-content;
-    top: 0.5%;
-    left: 1%;
+    top: 0%;
+    left: 0%;
     /* transform: translate(-50%, -50%) scale(1); */
 
-    /* justify-content: center;
-    align-items: center; */
+    justify-content: center;
+    align-items: center;
     transition: all 500ms ease-in-out;
 }
 
