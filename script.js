@@ -7,6 +7,14 @@ import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/l
 import { RGBELoader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/loaders/RGBELoader.js';
 import { EffectComposer } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { FilmPass } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/FilmPass.js';
+import { ShaderPass } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/ShaderPass.js';
+import { SMAAPass } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/SMAAPass.js';
+
+import { VignetteShader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/shaders/VignetteShader.js';
+import { PixelShader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/shaders/PixelShader.js'; 
+import { FXAAShader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/shaders/FXAAShader.js'; 
 import * as TWEEN from 'https://cdn.skypack.dev/@tweenjs/tween.js'
 import {CSS3DRenderer, CSS3DObject} from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/renderers/CSS3DRenderer.js';
 import * as dat from 'https://cdn.skypack.dev/dat.gui';
@@ -38,11 +46,13 @@ const controls = new OrbitControls(camera, canvas)
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: false, 
-    antialias: true,
+    antialias: false,
     alphaBuffer: false,
     depth: false,
     powerPreference: "high-performance"
 });
+
+var delta = 0.001;
 
 //** CSS3dRENDERER AND ELEMENT FUNCTION */
 var Element = function ( id, x, y, z, ry , divId) {
@@ -54,7 +64,8 @@ var Element = function ( id, x, y, z, ry , divId) {
     iframe.style.width = '1920px';
     iframe.style.height = '1080px';
     iframe.style.border = '0px';
-    iframe.src = [ 'https://www.youtube.com/embed/', id, '?rel=0&autoplay=1&mute=1' ].join( '' );
+    iframe.src = [ 'https://www.youtube.com/embed/', id, '' ].join( '' );
+    //?rel=0&autoplay=1&mute=1
     iframe.id = "animationYoutubeVideo";
 
     div.appendChild( iframe );
@@ -72,7 +83,42 @@ cssRenderer.setSize( window.innerWidth, window.innerHeight );
 document.getElementById('css').appendChild(cssRenderer.domElement);
 
 //** EFFECT COMPOSER */
-const composer = new EffectComposer(renderer);
+let composer = new EffectComposer(renderer);
+composer.setSize(window.innerWidth, window.innerHeight);
+
+//** RENDER PASSES */
+const filmPass = new FilmPass(
+    0.5,   // noise intensity
+    0.1,  // scanline intensity
+    648,    // scanline count
+    false,  // grayscale
+);
+filmPass.renderToScreen = true;
+//** VINGETTE */
+const shaderVignette = VignetteShader;
+const effectVignette = new ShaderPass(shaderVignette);
+effectVignette.uniforms[ 'offset' ].value = 1;
+effectVignette.uniforms[ 'darkness' ].value = 1;
+//** PIXEL SHADER */
+const shaderPixel = PixelShader;
+const effectPixel = new ShaderPass(shaderPixel);
+effectPixel.uniforms[ 'resolution' ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
+effectPixel.uniforms[ 'resolution' ].value.multiplyScalar( window.devicePixelRatio );
+effectPixel.uniforms[ 'pixelSize' ].value = 3;
+
+const shaderFXAA = FXAAShader;
+const effectFXAA = new ShaderPass(shaderFXAA);
+const pixelRatio = renderer.getPixelRatio() * 5;
+effectFXAA.material.uniforms[ 'resolution' ].value.x = 1 / ( canvas.offsetWidth * pixelRatio );
+effectFXAA.material.uniforms[ 'resolution' ].value.y = 1 / ( canvas.offsetHeight * pixelRatio );
+
+const smaaPass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
+
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(effectFXAA);
+composer.addPass(new UnrealBloomPass({x: 1024, y: 1024}, 0.5, 0.0, 0.9));
+composer.addPass(filmPass);
+composer.addPass(effectVignette);
 
 controlSetup();
 function controlSetup()
@@ -283,7 +329,7 @@ function init()
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.5;
+    renderer.toneMappingExposure = 3;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     //controls.target.y = 1;
@@ -482,7 +528,7 @@ function init()
 
     //** YOUTUBE VIDEO POSITION */
     var group = new THREE.Group();
-    var portfolioPlay = new Element( 'jtmlqDiMyII', -4.026, 0.79, -6.25, 0 );
+    var portfolioPlay = new Element( 'playlist?list=PLeL95S0ZCy3wjDQrigPNbTm4olu4dYHGD', -4.026, 0.79, -6.25, 0 );
     portfolioPlay.scale.set(.00076, .00076, .00076);
 	group.add(portfolioPlay);
     cssScene.add( group );
@@ -500,7 +546,7 @@ function init()
     //cssObject.rotation.set(portfolioScreen.rotation);
     //cssScene.add(cssObject);
 
-    scene.add(focusBox);
+    //scene.add(focusBox);
     focusBox.scale.set(0.1, 0.1, 0.1);
     renderer.domElement.addEventListener("click", onclick, true);
 
@@ -711,32 +757,36 @@ function hoverObject() {
 
     //console.log(intersects[0].object.name);
 
-    if (intersects.length > 0 && intersects[0].object.name == "resume" ||
-    intersects[0].object.name == "photo" || intersects[0].object.name == "creative technologist" || 
-    intersects[0].object.name == "contact")
+    if(intersects.length > 0)
     {
-        intersectObject = intersects[0].object;
-        intersected = true;
-        intersectObject.material.opacity = 0.5;
-        intersectObject.material.side = THREE.FrontSide;
-        console.log("On Object");
-        document.body.style.cursor = 'pointer' 
-    }
-    else if(intersects.length > 0 && intersects[0].object.name == "Cube001")
-    {
-        
-    }
-    else
-    {
-        if (intersected) 
+        if (intersects[0].object.name == "resume" ||
+        intersects[0].object.name == "photo" || intersects[0].object.name == "creative technologist" || 
+        intersects[0].object.name == "contact")
         {
-            console.log("Off Object");
-            intersected = false;
-            intersectObject.material.opacity = 0;
-            intersectObject = null;
-            document.body.style.cursor = 'default'
+            intersectObject = intersects[0].object;
+            intersected = true;
+            intersectObject.material.opacity = 0.5;
+            intersectObject.material.side = THREE.FrontSide;
+            console.log("On Object");
+            document.body.style.cursor = 'pointer' 
+        }
+        else if(intersects[0].object.name == "Cube001")
+        {
+            
+        }
+        else
+        {
+            if (intersected) 
+            {
+                console.log("Off Object");
+                intersected = false;
+                intersectObject.material.opacity = 0;
+                intersectObject = null;
+                document.body.style.cursor = 'default'
+            }
         }
     }
+    
 }
 
 function clickEvent() {
@@ -837,7 +887,8 @@ const tick = () =>
     controls.update()
 
     // Render
-    renderer.render(scene, camera);
+    composer.render(delta);
+    //renderer.render(scene, camera);
     cssRenderer.render(cssScene, camera);
 
     // Call tick again on the next frame
@@ -866,8 +917,9 @@ function animate()
 
     if ( mixer ) mixer.update( delta );
 
-    renderer.render( scene, camera );
-    cssRenderer.render(cssScene, camera);
+    //renderer.render( scene, camera );
+    composer.render(delta);
+    //cssRenderer.render(cssScene, camera);
 
     //Video Textures
     tallVideoTexture.needsUpdate = true;
@@ -982,7 +1034,6 @@ titleButton.addEventListener("click", function (ev) {
 animationButton.addEventListener("click", function (ev) {
   ev.stopPropagation(); // prevent event from bubbling up to .container
   console.log("ANIMATION");
-
 
   if(!document.getElementById("animationYoutubeVideo").classList.contains("active"))
   {

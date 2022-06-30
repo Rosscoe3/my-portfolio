@@ -43,8 +43,8 @@ section {
 .titles{
     position: absolute;
     display: grid;
-    /* padding: 20px;
-    gap: 20vw; */
+    padding: 20px;
+    gap: 1vh;
 
     
     width: fit-content;
