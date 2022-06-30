@@ -70,7 +70,7 @@ section {
     height: fit-content;
     pointer-events: auto;
 
-    font-size: 5vh;
+    font-size: 8vh;
     color: white;
 
     transition: opacity 0.25s;

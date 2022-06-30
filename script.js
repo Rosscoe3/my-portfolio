@@ -108,7 +108,7 @@ effectPixel.uniforms[ 'pixelSize' ].value = 3;
 
 const shaderFXAA = FXAAShader;
 const effectFXAA = new ShaderPass(shaderFXAA);
-const pixelRatio = renderer.getPixelRatio() * 7;
+var pixelRatio = renderer.getPixelRatio() * 6;
 effectFXAA.material.uniforms[ 'resolution' ].value.x = 1 / ( canvas.offsetWidth * pixelRatio );
 effectFXAA.material.uniforms[ 'resolution' ].value.y = 1 / ( canvas.offsetHeight * pixelRatio );
 
@@ -1010,6 +1010,10 @@ window.addEventListener('resize', () =>
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    
+    // pixelRatio = renderer.getPixelRatio() * 7;
+    // effectFXAA.material.uniforms[ 'resolution' ].value.x = 1 / ( canvas.offsetWidth * pixelRatio );
+    // effectFXAA.material.uniforms[ 'resolution' ].value.y = 1 / ( canvas.offsetHeight * pixelRatio );
 
     cssRenderer.setSize(sizes.width, sizes.height);
 });
