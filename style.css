@@ -41,6 +41,22 @@ section {
     height: 100vh;
 }
 
+.introText{
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    font-size: 4vh;
+
+    width: fit-content;
+    color: white;
+}
+.introText.active{
+    opacity: 100%;
+    transition: all 500ms ease-in-out;
+}
+
 .titles{
     position: absolute;
     display: grid;
@@ -58,7 +74,6 @@ section {
     align-items: center;
     transition: all 500ms ease-in-out;
 }
-
 .title
 {
     /* position: absolute; */
@@ -69,14 +84,21 @@ section {
     width: fit-content;
     height: fit-content;
     pointer-events: auto;
+    opacity: 0%;
 
     font-size: 5vh;
     color: white;
 
     transition: opacity 0.25s;
+    transition: all 1000ms ease-in-out;
 }
 
-.title:hover
+.title.active{
+    opacity: 100%;
+    transition: all 1000ms ease-in-out;
+}
+
+.title.active:hover
 {
     opacity: 50%;
     transition: opacity 0.25s;

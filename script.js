@@ -108,7 +108,7 @@ effectPixel.uniforms[ 'pixelSize' ].value = 3;
 
 const shaderFXAA = FXAAShader;
 const effectFXAA = new ShaderPass(shaderFXAA);
-var pixelRatio = renderer.getPixelRatio() * 6;
+var pixelRatio = renderer.getPixelRatio() * 5;
 effectFXAA.material.uniforms[ 'resolution' ].value.x = 1 / ( canvas.offsetWidth * pixelRatio );
 effectFXAA.material.uniforms[ 'resolution' ].value.y = 1 / ( canvas.offsetHeight * pixelRatio );
 
@@ -163,6 +163,7 @@ manager.onLoad = function () {
   RESOURCES_LOADED = true;
   document.querySelector(".progress").classList.toggle("disabled");
   document.querySelector(".progressContainer").classList.toggle("disabled");
+  introText.classList.toggle("active");
 };
 manager.onProgress = function (url, itemsLoaded, itemsTotal) {
   // console.log(
@@ -238,11 +239,15 @@ const resumeBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: 
 const artStationBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
 const linkedInBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
 const contactBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
+const blenderBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
+const unityBoxMaterial = new THREE.MeshBasicMaterial({color: "white", opacity: "0%", transparent: true});
 
 const resumeBox = new THREE.Mesh(geometry, resumeBoxMaterial);
 const artStationBox = new THREE.Mesh(geometry, artStationBoxMaterial);
 const linkedInBox = new THREE.Mesh(geometry, linkedInBoxMaterial);
 const contactBox = new THREE.Mesh(geometry, contactBoxMaterial);
+const blenderBox = new THREE.Mesh(geometry, blenderBoxMaterial);
+const unityBox = new THREE.Mesh(geometry, unityBoxMaterial);
 plane.rotation.x = Math.PI / 2;
 plane.position.y = -1;
 //scene.add( plane );
@@ -263,6 +268,7 @@ let interactivesButton = document.getElementById("interactives");
 let aboutButton = document.getElementById("about");
 let titleButton = document.getElementById("title");
 let squareVideo = document.getElementById("video");
+let introText = document.getElementById("introText");
 
 let squareVideoTexture = new THREE.VideoTexture(squareVideo);
 //squareVideoTexture.minFilter = THREE.LinearFilter;
@@ -352,26 +358,36 @@ function init()
     artStationBox.name = 'photo';
     linkedInBox.name = 'creative technologist';
     contactBox.name = 'contact';
+    blenderBox.name = 'blender';
+    unityBox.name = 'unity';
 
     resumeBox.userdata = "asdf";
     artStationBox.userdata = "https://www.artstation.com/rosscoe3/";
     linkedInBox.userdata = "https://www.linkedin.com/in/ross-walter-0043bb211/";
     contactBox.userdata = "https://www.linkedin.com/in/ross-walter-0043bb211/overlay/contact-info/";
+    blenderBox.userdata = "https://www.artstation.com/rosscoe3/albums/6265419";
+    unityBox.userdata = "https://www.artstation.com/rosscoe3/albums/5355287";
     
     resumeBox.scale.set(0.1, 0.075, 0.28);
     artStationBox.scale.set(0.1, 0.55, 0.55);
     linkedInBox.scale.set(0.1, 0.2, 0.55);
     contactBox.scale.set(0.1, 0.075, 0.3);
+    blenderBox.scale.set(0.1, 0.125, 0.125);
+    unityBox.scale.set(0.1, 0.125, 0.125);
     
     resumeBox.position.set(4.93, 0.426, -0.44);
     artStationBox.position.set(4.93, 1.009, -0.288);
     linkedInBox.position.set(4.93, 0.619, -0.31);
     contactBox.position.set(4.93, 0.31, 0);
+    blenderBox.position.set(4.93, 0.085, -0.51);
+    unityBox.position.set(4.93, 0.085, -0.36);
     
     scene.add(resumeBox);
     scene.add(artStationBox);
     scene.add(linkedInBox);
     scene.add(contactBox);
+    scene.add(blenderBox);
+    scene.add(unityBox);
 
     //** 3d OBJECTS */
     //** GTLF LOADER AND ANIMATIONS */
@@ -761,7 +777,8 @@ function hoverObject() {
     {
         if (intersects[0].object.name == "resume" ||
         intersects[0].object.name == "photo" || intersects[0].object.name == "creative technologist" || 
-        intersects[0].object.name == "contact")
+        intersects[0].object.name == "contact" || intersects[0].object.name == "blender" || 
+        intersects[0].object.name == "unity")
         {
             intersectObject = intersects[0].object;
             intersected = true;
@@ -802,7 +819,8 @@ function clickEvent() {
 
         if (intersects.length > 0 && 
         intersects[0].object.name == "photo" || intersects[0].object.name == "creative technologist" || 
-        intersects[0].object.name == "contact")
+        intersects[0].object.name == "contact" || intersects[0].object.name == "blender" || 
+        intersects[0].object.name == "unity")
         {
             console.log("clicked about link");
             clickOpenURL(intersects, intersects[0].object.userdata);
@@ -956,30 +974,30 @@ const guiWorld = {
   };
   
 gui.add(guiWorld.xPos, "x", -1, 1).onChange(() => {
-    resumeBox.position.set(
+    unityBox.position.set(
     guiWorld.xPos.x,
-    resumeBox.position.y,
-    resumeBox.position.z
+    unityBox.position.y,
+    unityBox.position.z
 );
-console.log(resumeBox.position);
+console.log(unityBox.position);
 });
 
 gui.add(guiWorld.xPos, "y", -1, 2).onChange(() => {
-    resumeBox.position.set(
-        resumeBox.position.x,
+    unityBox.position.set(
+        unityBox.position.x,
     guiWorld.xPos.y,
-    resumeBox.position.z
+    unityBox.position.z
 );
-console.log(resumeBox.position);
+console.log(unityBox.position);
 });
 
 gui.add(guiWorld.xPos, "z", -1, 1).onChange(() => {
-    resumeBox.position.set(
-        resumeBox.position.x,
-        resumeBox.position.y,
+    unityBox.position.set(
+        unityBox.position.x,
+        unityBox.position.y,
     guiWorld.xPos.z
 );
-console.log(resumeBox.position);
+console.log(unityBox.position);
 });
 
 //** BLOCKER FOR YOUTUBE VIDEOS */
@@ -993,6 +1011,16 @@ document.addEventListener( 'mousedown', function () {
 document.addEventListener( 'mouseup', function () {
     blocker.style.display = 'none';
 } );
+
+document.addEventListener('touchstart', function (event) {
+    console.log("touchStart");
+    hoverObject();
+    onclick(event);
+});
+document.addEventListener('touchend', function (event) {
+    console.log("touchEND");
+    onclick(event);
+});
 
 window.addEventListener("mousemove", function (event) {
     onMouseMove(event);
