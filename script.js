@@ -87,7 +87,7 @@ let composer = new EffectComposer(renderer);
 composer.setSize(window.innerWidth, window.innerHeight);
 
 //** RENDER PASSES */
-const filmPass = new FilmPass(
+let filmPass = new FilmPass(
     0.5,   // noise intensity
     0.1,  // scanline intensity
     648,    // scanline count
@@ -217,6 +217,7 @@ var raycaster = new THREE.Raycaster();
 var intersects, intersectObject;
 var intersected = false;
 var viewIndex = 0;
+var grayscale = false;
 
 // Lights
 const pointLight = new THREE.PointLight( 'white', 50, 10 );
@@ -261,6 +262,7 @@ sphereMesh.position.set(0, 0, 0);
 sphereMesh.scale.set(0.5, 0.5, 0.5);
 var planets;
 var tween, camTween;
+var intro = true;
 
 //** HTML REFERENCES **/
 let animationButton = document.getElementById("animation");
@@ -269,6 +271,7 @@ let aboutButton = document.getElementById("about");
 let titleButton = document.getElementById("title");
 let squareVideo = document.getElementById("video");
 let introText = document.getElementById("introText");
+let blackAndWhiteButton = document.getElementById("blackAndWhite");
 
 let squareVideoTexture = new THREE.VideoTexture(squareVideo);
 //squareVideoTexture.minFilter = THREE.LinearFilter;
@@ -813,28 +816,63 @@ function clickEvent() {
 
     console.log(intersects[0]);
 
-    if(intersects[0])
+    if(intro)
     {
-        intersectObject = intersects[0].object;
+        introTextSequence();
+        intro = false;
+    }
+    else
+    {
+        if(intersects[0])
+        {
+            intersectObject = intersects[0].object;
 
-        if (intersects.length > 0 && 
-        intersects[0].object.name == "photo" || intersects[0].object.name == "creative technologist" || 
-        intersects[0].object.name == "contact" || intersects[0].object.name == "blender" || 
-        intersects[0].object.name == "unity")
-        {
-            console.log("clicked about link");
-            clickOpenURL(intersects, intersects[0].object.userdata);
-        }
-        else if(intersects.length > 0 && intersects[0].object.name == "resume")
-        {
-            // Download("/images/Ross Walter - Resume.pdf")''
-            window.open("/images/Ross Walter - Resume.pdf", '_blank');
-        }
-        else if(intersects.length > 0 && intersects[0].object.name == "Cube001")
-        {
-            clickOpenURL(intersects, "https://open.spotify.com/artist/4z8B0p2AoxbT3usRPl1dS7");
+            if (intersects.length > 0 && 
+            intersects[0].object.name == "photo" || intersects[0].object.name == "creative technologist" || 
+            intersects[0].object.name == "contact" || intersects[0].object.name == "blender" || 
+            intersects[0].object.name == "unity")
+            {
+                console.log("clicked about link");
+                clickOpenURL(intersects, intersects[0].object.userdata);
+            }
+            else if(intersects.length > 0 && intersects[0].object.name == "resume")
+            {
+                // Download("/images/Ross Walter - Resume.pdf")''
+                window.open("/images/Ross Walter - Resume.pdf", '_blank');
+            }
+            else if(intersects.length > 0 && intersects[0].object.name == "Cube001")
+            {
+                clickOpenURL(intersects, "https://open.spotify.com/artist/4z8B0p2AoxbT3usRPl1dS7");
+            }
         }
     }
+
+}
+
+function introTextSequence()
+{
+    introText.classList.toggle("active");
+    setTimeout(function() 
+    {
+        titleButton.classList.toggle("active");
+        setTimeout(function() 
+        {
+            animationButton.classList.toggle("active");
+            setTimeout(function() 
+            {
+                interactivesButton.classList.toggle("active");
+                setTimeout(function() 
+                {
+                    aboutButton.classList.toggle("active");
+                    setTimeout(function() 
+                    {
+                        introText.innerHTML = "Use the titles to navigate"
+                        introText.classList.toggle("active");
+                    }, 1000);
+                }, 500);
+            }, 500);
+        }, 500);
+    }, 500);
 }
 
 //** OPENS URLS ON HOVERCLICK */
@@ -1014,6 +1052,12 @@ document.addEventListener( 'mouseup', function () {
 
 document.addEventListener('touchstart', function (event) {
     console.log("touchStart");
+    if(intro)
+    {
+        intro = false;
+        introTextSequence();
+    }
+
     hoverObject();
     onclick(event);
 });
@@ -1061,6 +1105,10 @@ titleButton.addEventListener("click", function (ev) {
     {
         document.getElementById("animationYoutubeVideo").classList.toggle("active");
     }
+    if(introText.classList.contains("active"))
+    {
+        introText.classList.toggle("active");
+    }
   });
 
 animationButton.addEventListener("click", function (ev) {
@@ -1071,6 +1119,11 @@ animationButton.addEventListener("click", function (ev) {
   {
     document.getElementById("animationYoutubeVideo").classList.toggle("active");
   }
+  if(introText.classList.contains("active"))
+    {
+        introText.classList.toggle("active");
+    }
+  
 
   lessonCameraMove(4);
 });
@@ -1078,6 +1131,10 @@ animationButton.addEventListener("click", function (ev) {
 interactivesButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
     console.log("INTERACTIVE");
+    if(introText.classList.contains("active"))
+    {
+        introText.classList.toggle("active");
+    }
   
     lessonCameraMove(2);
   });
@@ -1086,7 +1143,41 @@ aboutButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
     console.log("ABOUT");
 
+    if(introText.classList.contains("active"))
+    {
+        introText.classList.toggle("active");
+    }
+
     lessonCameraMove(3);
+});
+
+blackAndWhiteButton.addEventListener("click", function (ev) {
+    ev.stopPropagation(); // prevent event from bubbling up to .container
+    console.log("BLACK &  WHITE");
+    composer.removePass(filmPass);
+
+    if(grayscale)
+    {
+        filmPass = new FilmPass(
+            0.5,   // noise intensity
+            0.1,  // scanline intensity
+            648,    // scanline count
+            false,  // grayscale
+        );
+        grayscale = false;
+    }
+    else
+    {
+        filmPass = new FilmPass(
+            0.5,   // noise intensity
+            0.1,  // scanline intensity
+            648,    // scanline count
+            true,  // grayscale
+        );
+        grayscale = true;
+    }
+    
+    composer.addPass(filmPass);
 });
 
 

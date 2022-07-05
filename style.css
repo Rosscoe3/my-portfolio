@@ -43,17 +43,22 @@ section {
 
 .introText{
     position: absolute;
-    top: 80%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
-    opacity: 0;
-    font-size: 4vh;
+    opacity: 0%;
+    font-size: 5vh;
 
     width: fit-content;
     color: white;
+    transition: all 500ms ease-in-out;
 }
 .introText.active{
     opacity: 100%;
+    transition: all 500ms ease-in-out;
+}
+.introText.active:hover{
+    opacity: 50%;
     transition: all 500ms ease-in-out;
 }
 
@@ -91,6 +96,24 @@ section {
 
     transition: opacity 0.25s;
     transition: all 1000ms ease-in-out;
+}
+
+.blackAndWhite{
+    position: absolute;
+    opacity: 0%;
+    font-size: 5vh;
+    color: white;
+    width: fit-content;
+    height: fit-content;
+
+    bottom: 1%;
+    right: 2%;
+
+    transition: all 500ms ease-in-out;
+}
+.blackAndWhite:hover{
+    opacity: 100%;
+    transition: all 500ms ease-in-out;
 }
 
 .title.active{
