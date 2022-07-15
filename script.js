@@ -55,18 +55,30 @@ const renderer = new THREE.WebGLRenderer({
 var delta = 0.001;
 
 //** CSS3dRENDERER AND ELEMENT FUNCTION */
-var Element = function ( id, x, y, z, ry , divId) {
+var Element = function ( id, x, y, z, ry , divId, width, height) {
     var div = document.createElement( 'div' );
-    div.style.width = '1920px';
-    div.style.height = '1080px';
-    div.style.backgroundColor = '#000';
+    
     var iframe = document.createElement( 'iframe' );
-    iframe.style.width = '1920px';
-    iframe.style.height = '1080px';
     iframe.style.border = '0px';
     iframe.src = [ 'https://www.youtube.com/embed/', id, '' ].join( '' );
     //?rel=0&autoplay=1&mute=1
-    iframe.id = "animationYoutubeVideo";
+    iframe.id = divId;
+    if(width)
+    {
+        div.style.backgroundColor = '';
+        div.style.width = width;
+        div.style.height = height;
+        iframe.style.width = width;
+        iframe.style.height = height;
+    }
+    else
+    {
+        div.style.backgroundColor = '#000';
+        div.style.width = '1920px';
+        div.style.height = '1080px';
+        iframe.style.width = '1920px';
+        iframe.style.height = '1080px';
+    }
 
     div.appendChild( iframe );
     var object = new CSS3DObject( div );
@@ -176,12 +188,12 @@ manager.onProgress = function (url, itemsLoaded, itemsTotal) {
   //     " files."
   // );
 
-  var progress = (itemsTotal / itemsLoaded) * 100;
-  //console.log("Progress: " + progress);
+  var progress = (itemsLoaded/41) * 100;
+  console.log("Progress: " + progress);
 
   //Prevent from going over 100%
   if (progress > 100.0) {
-    progress = 100.0;
+    progress = 90.0;
   }
 
   document.querySelector(".progress__fill").style.width = progress + "%";
@@ -218,6 +230,9 @@ var intersects, intersectObject;
 var intersected = false;
 var viewIndex = 0;
 var grayscale = false;
+var fromPlanet = false;
+var camTween, focusTween;
+var ytVid2;
 
 // Lights
 const pointLight = new THREE.PointLight( 'white', 50, 10 );
@@ -314,12 +329,12 @@ const curve = new THREE.EllipseCurve(
     180                 // aRotation
 );
 
-const points = curve.getPoints( 100 );
-const orbitGeometry = new THREE.BufferGeometry().setFromPoints( points );
-const lineMaterial = new THREE.LineBasicMaterial( { color: 0xff0000 } );
-// Create the final object to add to the scene
-const orbit1 = new THREE.Line( orbitGeometry, lineMaterial );
-scene.add(orbit1);
+// const points = curve.getPoints( 100 );
+// const orbitGeometry = new THREE.BufferGeometry().setFromPoints( points );
+// const lineMaterial = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+// // Create the final object to add to the scene
+// const orbit1 = new THREE.Line( orbitGeometry, lineMaterial );
+// scene.add(orbit1);
 
 init();
 
@@ -329,7 +344,7 @@ function init()
     // camera.position.x = -0.78;
     // camera.position.y = 0.44;
     // camera.position.z = -2.4;
-    camera.position.set( -0.78, 0.44, -2.4 );
+    camera.position.set( -0.255, 0.83, -1.83 );
     //scene.add(camera);
 
     cssRenderer.setSize(sizes.width, sizes.height);
@@ -547,17 +562,19 @@ function init()
 
     //** YOUTUBE VIDEO POSITION */
     var group = new THREE.Group();
-    var portfolioPlay = new Element( 'playlist?list=PLeL95S0ZCy3wjDQrigPNbTm4olu4dYHGD', -4.026, 0.79, -6.25, 0 );
+    var portfolioPlay = new Element( 'playlist?list=PLeL95S0ZCy3wjDQrigPNbTm4olu4dYHGD', -4.026, 0.79, -6.25, 0, "animationYoutubeVideo");
     portfolioPlay.scale.set(.00076, .00076, .00076);
 	group.add(portfolioPlay);
     cssScene.add( group );
 
-    // var youtubeVid2 = new THREE.Group();
-    // var ytVid2 = new Element( 'jtmlqDiMyII', -7.93, 0.489, -0.54, 0);
-    // ytVid2.scale.set(.00076, .00076, .00076);
-    // ytVid2.rotation.y += 90;
-	// youtubeVid2.add(ytVid2);
-    // cssScene.add( youtubeVid2 );
+    var youtubeVid2 = new THREE.Group();
+    ytVid2 = new Element( 'GzhiGsciJJI?rel=0&loop=1&autoplay=1', -7.93, 0.535, -0.605, 0, "interactiveYoutubeVideo", "1080px", "1080px");
+    ytVid2.scale.set(.00095, .00095, .00095);
+    ytVid2.rotation.set(0, 1.6, 0);
+    //youtubeVid2.position.set(-7.93, 0.535, -0.605);
+    //youtubeVid2.position.set(-7.93, 0.489, -0.54);
+	youtubeVid2.add(ytVid2);
+    cssScene.add( youtubeVid2 );
 
     // add it to the css scene
     
@@ -625,26 +642,47 @@ function lessonCameraMove(index)
 
     controls.minAzimuthAngle = Infinity;
     controls.maxAzimuthAngle = Infinity;
+
+    var tweenTime;
+
+    if(camTween)
+    {
+        camTween.stop();
+    }
+    if(focusTween)
+    {
+        focusTween.stop();
+    }
+
+    if(fromPlanet)
+    {
+        tweenTime = 0;
+        fromPlanet = false;
+    }
+    else
+    {
+        tweenTime = 5000;
+    }
     
     if(index == 0)
     {
-        const camTween = new TWEEN.Tween(camera.position).to(
+        camTween = new TWEEN.Tween(camera.position).to(
         {
             x: -3.35,
             y: 0.65,
             z: -0.81
         },
-        5000
+        tweenTime
         ).easing(TWEEN.Easing.Quadratic.Out)
         camTween.start();
         
-        const focusTween = new TWEEN.Tween(focusBox.position).to(
+        focusTween = new TWEEN.Tween(focusBox.position).to(
             {
             x: planetHologram.position.x - 1,
             y: planetHologram.position.y,
             z: planetHologram.position.z
             },
-            5000
+            tweenTime
         ).easing(TWEEN.Easing.Quadratic.Out)
         .start();
         focusTween.onComplete(cameraMoveComplete);
@@ -653,51 +691,51 @@ function lessonCameraMove(index)
     else if(index == 1)
     {
         
-        const camTween1 = new TWEEN.Tween(camera.position).to(
+        camTween = new TWEEN.Tween(camera.position).to(
         {
             x: 0.38,
             y: 0.64,
             z: -1.78
         },
-        5000
+        tweenTime
         ).easing(TWEEN.Easing.Quadratic.Out)
-        camTween1.start();
+        camTween.start();
         
-        const focusTween1 = new TWEEN.Tween(focusBox.position).to(
+        focusTween = new TWEEN.Tween(focusBox.position).to(
         {
         x: mug.position.x,
         y: mug.position.y,
         z: mug.position.z
         },
-        5000
+        tweenTime
         ).easing(TWEEN.Easing.Quadratic.Out)
         .start();
-        focusTween1.onComplete(cameraMoveComplete);
+        focusTween.onComplete(cameraMoveComplete);
         viewIndex = 1;
     }
     else if(index == 2)
     {
-        const camTween2 = new TWEEN.Tween(focusBox.position).to(
+        camTween = new TWEEN.Tween(focusBox.position).to(
             {
             x: screenFrame.position.x,
             y: screenFrame.position.y,
             z: screenFrame.position.z
             },
-            5000
+            tweenTime
         ).easing(TWEEN.Easing.Quadratic.Out)
         .start();
-        camTween2.onComplete(cameraMoveComplete);
+        camTween.onComplete(cameraMoveComplete);
         viewIndex = 2;
     }
     else if(index == 3)
     {
-        const camTween = new TWEEN.Tween(focusBox.position).to(
+        camTween = new TWEEN.Tween(focusBox.position).to(
             {
             x: aboutScreen.position.x,
             y: aboutScreen.position.y,
             z: aboutScreen.position.z
             },
-            5000
+            tweenTime
         ).easing(TWEEN.Easing.Quadratic.Out)
         .start();
         camTween.onComplete(cameraMoveComplete);
@@ -705,23 +743,45 @@ function lessonCameraMove(index)
     }
     else if(index == 4)
     {
-        const camTween = new TWEEN.Tween(focusBox.position).to(
+        camTween = new TWEEN.Tween(focusBox.position).to(
             {
             x: portfolioScreen.position.x,
             y: portfolioScreen.position.y,
             z: portfolioScreen.position.z
             },
-            5000
+            tweenTime
         ).easing(TWEEN.Easing.Quadratic.Out)
         .start();
         camTween.onComplete(cameraMoveComplete);
         viewIndex = 4;
+    }
+    else if(index == 5)
+    {
+        fromPlanet = true;
+        camTween = new TWEEN.Tween(focusBox.position).to(
+            {
+            x: icyPlanet.position.x,
+            y: icyPlanet.position.y,
+            z: icyPlanet.position.z
+            },
+            0
+        ).easing(TWEEN.Easing.Quadratic.Out)
+        .start();
+        camTween.onComplete(cameraMoveComplete);
+        viewIndex = 5;
     }
 }
 
 function cameraMoveComplete()
 {
     console.log("TWEEN IS DONE");
+
+    if(!controls.enabled)
+    {
+        controls.enabled = true;
+    }
+    controls.minDistance = 1;
+    controls.maxDistance = 3;
     
     //INTERACTIVES//
     if(viewIndex == 0)
@@ -768,16 +828,28 @@ function cameraMoveComplete()
         controls.minAzimuthAngle = Math.PI * -0.25;
         controls.maxAzimuthAngle = Math.PI * 0.3;
     }
+    //**PLANET SCREEN */ 
+    else if(viewIndex == 5)
+    {
+        controls.minPolarAngle = Math.PI/2.5;
+        controls.maxPolarAngle = Math.PI/1.5;
+
+        controls.minAzimuthAngle = Math.PI * 0.75;
+        controls.maxAzimuthAngle = Math.PI * -0.75;
+        controls.enabled = true;
+
+        controls.minDistance = 60;
+        controls.maxDistance = 75;
+    }
 }
 
 function hoverObject() {
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(scene.children, true);
-
-    //console.log(intersects[0].object.name);
-
+    
     if(intersects.length > 0)
     {
+        //console.log(intersects[0].object.name);
         if (intersects[0].object.name == "resume" ||
         intersects[0].object.name == "photo" || intersects[0].object.name == "creative technologist" || 
         intersects[0].object.name == "contact" || intersects[0].object.name == "blender" || 
@@ -790,23 +862,31 @@ function hoverObject() {
             console.log("On Object");
             document.body.style.cursor = 'pointer' 
         }
-        else if(intersects[0].object.name == "Cube001")
+        else if(intersects[0].object.name == "Clouds-icyPlanet001")
         {
-            
+            document.body.style.cursor = 'pointer' 
+        }
+        else if(intersects[0].object.name == "Room")
+        {
+            document.body.style.cursor = 'default' 
         }
         else
         {
             if (intersected) 
             {
                 console.log("Off Object");
+                document.body.style.cursor = 'default'
                 intersected = false;
                 intersectObject.material.opacity = 0;
+                console.log(intersectObject);
                 intersectObject = null;
-                document.body.style.cursor = 'default'
             }
         }
     }
-    
+    else
+    {
+        document.body.style.cursor = 'default'
+    }
 }
 
 function clickEvent() {
@@ -834,6 +914,10 @@ function clickEvent() {
             {
                 console.log("clicked about link");
                 clickOpenURL(intersects, intersects[0].object.userdata);
+            }
+            else if(intersects.length > 0 && intersects[0].object.name == "Clouds-icyPlanet001")
+            {
+                lessonCameraMove(5);
             }
             else if(intersects.length > 0 && intersects[0].object.name == "resume")
             {
@@ -976,10 +1060,16 @@ function animate()
     //renderer.render( scene, camera );
     composer.render(delta);
     //cssRenderer.render(cssScene, camera);
+    //console.log(camera.position);
 
     //Video Textures
     tallVideoTexture.needsUpdate = true;
     squareVideoTexture.needsUpdate = true;
+
+    //console.log("Scene polycount:", renderer.info.render.triangles)
+    //console.log("Active Drawcalls:", renderer.info.render.calls)
+    //console.log("Textures in Memory", renderer.info.memory.textures)
+    //console.log("Geometries in Memory", renderer.info.memory.geometries)
 
     if(RESOURCES_LOADED)
     {
@@ -1011,31 +1101,31 @@ const guiWorld = {
     }
   };
   
-gui.add(guiWorld.xPos, "x", -1, 1).onChange(() => {
-    unityBox.position.set(
+gui.add(guiWorld.xPos, "x", -10, 10).onChange(() => {
+    ytVid2.position.set(
     guiWorld.xPos.x,
-    unityBox.position.y,
-    unityBox.position.z
+    ytVid2.position.y,
+    ytVid2.position.z
 );
-console.log(unityBox.position);
+console.log(ytVid2.position);
 });
 
 gui.add(guiWorld.xPos, "y", -1, 2).onChange(() => {
-    unityBox.position.set(
-        unityBox.position.x,
+    ytVid2.position.set(
+        ytVid2.position.x,
     guiWorld.xPos.y,
-    unityBox.position.z
+    ytVid2.position.z
 );
-console.log(unityBox.position);
+console.log(ytVid2.position);
 });
 
 gui.add(guiWorld.xPos, "z", -1, 1).onChange(() => {
-    unityBox.position.set(
-        unityBox.position.x,
-        unityBox.position.y,
+    ytVid2.position.set(
+        ytVid2.position.x,
+        ytVid2.position.y,
     guiWorld.xPos.z
 );
-console.log(unityBox.position);
+console.log(ytVid2.position);
 });
 
 //** BLOCKER FOR YOUTUBE VIDEOS */
@@ -1109,6 +1199,10 @@ titleButton.addEventListener("click", function (ev) {
     {
         introText.classList.toggle("active");
     }
+    if(document.getElementById("interactiveYoutubeVideo").classList.contains("active"))
+    {
+    document.getElementById("interactiveYoutubeVideo").classList.toggle("active");
+    }
   });
 
 animationButton.addEventListener("click", function (ev) {
@@ -1123,6 +1217,10 @@ animationButton.addEventListener("click", function (ev) {
     {
         introText.classList.toggle("active");
     }
+    if(document.getElementById("interactiveYoutubeVideo").classList.contains("active"))
+    {
+    document.getElementById("interactiveYoutubeVideo").classList.toggle("active");
+    }
   
 
   lessonCameraMove(4);
@@ -1131,6 +1229,10 @@ animationButton.addEventListener("click", function (ev) {
 interactivesButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
     console.log("INTERACTIVE");
+    if(!document.getElementById("interactiveYoutubeVideo").classList.contains("active"))
+    {
+    document.getElementById("interactiveYoutubeVideo").classList.toggle("active");
+    }
     if(introText.classList.contains("active"))
     {
         introText.classList.toggle("active");
@@ -1146,6 +1248,10 @@ aboutButton.addEventListener("click", function (ev) {
     if(introText.classList.contains("active"))
     {
         introText.classList.toggle("active");
+    }
+    if(document.getElementById("interactiveYoutubeVideo").classList.contains("active"))
+    {
+    document.getElementById("interactiveYoutubeVideo").classList.toggle("active");
     }
 
     lessonCameraMove(3);
@@ -1169,9 +1275,9 @@ blackAndWhiteButton.addEventListener("click", function (ev) {
     else
     {
         filmPass = new FilmPass(
-            0.5,   // noise intensity
-            0.1,  // scanline intensity
-            648,    // scanline count
+            2.0,   // noise intensity
+            0.5,  // scanline intensity
+            1286,    // scanline count
             true,  // grayscale
         );
         grayscale = true;

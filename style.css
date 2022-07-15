@@ -100,7 +100,7 @@ section {
 
 .blackAndWhite{
     position: absolute;
-    opacity: 0%;
+    opacity: 75%;
     font-size: 5vh;
     color: white;
     width: fit-content;
@@ -112,7 +112,7 @@ section {
     transition: all 500ms ease-in-out;
 }
 .blackAndWhite:hover{
-    opacity: 100%;
+    opacity: 25%;
     transition: all 500ms ease-in-out;
 }
 
@@ -227,6 +227,8 @@ iframe.active{
 
 .progress {
     position: absolute;
+    background: rgb(53, 53, 53);
+    border-radius: 10px;
     width: 50vw;
     height: 1vh;
     z-index: 100;
@@ -241,6 +243,24 @@ iframe.active{
     border-radius: 10px;
     opacity: 100%;
     transition: all 500ms ease-in-out;
+  }
+  .progress .title
+  {
+      position: absolute;
+      opacity: 100%;
+      width: fit-content;
+      height: fit-content;
+      pointer-events: auto;
+      opacity: 50%;
+      top: 100%;
+      left: 50%;
+      transform: translate(-50%, 50%);
+  
+      font-size: 4vh;
+      color: white;
+  
+      transition: opacity 0.25s;
+      transition: all 1000ms ease-in-out;
   }
   
   .progress.disabled{
