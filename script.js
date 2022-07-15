@@ -4,6 +4,7 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.127.0/build/three.module
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/controls/OrbitControls.js'
 // import * as dat from 'dat.gui'
 import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from "https://cdn.skypack.dev/three@0.127.0/examples/jsm/loaders/DRACOLoader.js";
 import { RGBELoader } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/loaders/RGBELoader.js';
 import { EffectComposer } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'https://cdn.skypack.dev/three@0.127.0/examples/jsm/postprocessing/RenderPass.js';
@@ -410,6 +411,11 @@ function init()
     //** 3d OBJECTS */
     //** GTLF LOADER AND ANIMATIONS */
     var loader = new GLTFLoader(manager);
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderConfig({ type: 'js' });
+    dracoLoader.setDecoderPath( 'https://www.gstatic.com/draco/v1/decoders/' );
+    loader.setDRACOLoader( dracoLoader );
+
     loader.load( '/models/IcePlanet.glb', function ( gltf ) {
         //scene.add(gltf.scene);
 
