@@ -1086,47 +1086,47 @@ function animate()
     //lessonCameraMove();
 }
 
-const gui = new dat.GUI();
+// const gui = new dat.GUI();
 
-const guiWorld = {
-    xPos: {
-      x: 0,
-      y: 0,
-      z: 0,
-    },
-    rotPos:{
-      x: 0,
-      y: 0, 
-      z: 0,
-    }
-  };
+// const guiWorld = {
+//     xPos: {
+//       x: 0,
+//       y: 0,
+//       z: 0,
+//     },
+//     rotPos:{
+//       x: 0,
+//       y: 0, 
+//       z: 0,
+//     }
+//   };
   
-gui.add(guiWorld.xPos, "x", -10, 10).onChange(() => {
-    ytVid2.position.set(
-    guiWorld.xPos.x,
-    ytVid2.position.y,
-    ytVid2.position.z
-);
-console.log(ytVid2.position);
-});
+// gui.add(guiWorld.xPos, "x", -10, 10).onChange(() => {
+//     ytVid2.position.set(
+//     guiWorld.xPos.x,
+//     ytVid2.position.y,
+//     ytVid2.position.z
+// );
+// console.log(ytVid2.position);
+// });
 
-gui.add(guiWorld.xPos, "y", -1, 2).onChange(() => {
-    ytVid2.position.set(
-        ytVid2.position.x,
-    guiWorld.xPos.y,
-    ytVid2.position.z
-);
-console.log(ytVid2.position);
-});
+// gui.add(guiWorld.xPos, "y", -1, 2).onChange(() => {
+//     ytVid2.position.set(
+//         ytVid2.position.x,
+//     guiWorld.xPos.y,
+//     ytVid2.position.z
+// );
+// console.log(ytVid2.position);
+// });
 
-gui.add(guiWorld.xPos, "z", -1, 1).onChange(() => {
-    ytVid2.position.set(
-        ytVid2.position.x,
-        ytVid2.position.y,
-    guiWorld.xPos.z
-);
-console.log(ytVid2.position);
-});
+// gui.add(guiWorld.xPos, "z", -1, 1).onChange(() => {
+//     ytVid2.position.set(
+//         ytVid2.position.x,
+//         ytVid2.position.y,
+//     guiWorld.xPos.z
+// );
+// console.log(ytVid2.position);
+// });
 
 //** BLOCKER FOR YOUTUBE VIDEOS */
 var blocker = document.getElementById( 'blocker' );
