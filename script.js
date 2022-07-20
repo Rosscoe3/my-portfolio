@@ -41,8 +41,8 @@ const sizes = {
     height: window.innerHeight
 }
 //** CAMERA AND CONTROLS */
-const camera = new THREE.PerspectiveCamera(55, sizes.width / sizes.height, 0.1, 100000)
-const mainCamera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100000)
+const camera = new THREE.PerspectiveCamera(55, sizes.width / sizes.height, 0.1, 100)
+const mainCamera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 const controls = new OrbitControls(camera, canvas)
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
@@ -235,8 +235,6 @@ var fromPlanet = false;
 var camTween, focusTween;
 var ytVid2;
 
-// Lights
-const pointLight = new THREE.PointLight( 'white', 50, 10 );
 //const hemisphereLight = new THREE.ambi(0xf2f2f2, 0xf2f2f2, 1.0);
 const directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
 const helper = new THREE.DirectionalLightHelper( directionalLight, 1 );
@@ -363,10 +361,6 @@ function init()
     //console.log(points[0])
 
     //** LIGHTS */
-    pointLight.position.x = icyPlanet.position.x + 100;
-    pointLight.position.y = icyPlanet.position.y;
-    pointLight.position.z = icyPlanet.position.z;
-    //scene.add(pointLight)
     //scene.add(hemisphereLight);
     directionalLight.target = new THREE.Object3D( 100, 1, -30 );
     scene.add( directionalLight );
@@ -416,7 +410,7 @@ function init()
     dracoLoader.setDecoderPath( 'https://www.gstatic.com/draco/v1/decoders/' );
     loader.setDRACOLoader( dracoLoader );
 
-    loader.load( '/models/IcePlanet.glb', function ( gltf ) {
+    loader.load( '/models/icyPlanet.glb', function ( gltf ) {
         //scene.add(gltf.scene);
 
         gltf.animations; // Array<THREE.AnimationClip>
@@ -445,7 +439,7 @@ function init()
             }
         });
     });
-    loader.load( '/models/Space-dreams-portfolio-update-4.glb', function ( gltf ) {
+    loader.load( '/models/Space-dreams-portfolio-update-7.glb', function ( gltf ) {
         //scene.add(gltf.scene);
 
         gltf.animations; // Array<THREE.AnimationClip>
@@ -469,7 +463,7 @@ function init()
         //o.material.normalScale = {x: .000001, y: .000001};
         //o.material.bumpscale = .1;
         //o.material.normalMapType = 0;
-        console.log("O:" + o.name);
+        //console.log("O:" + o.name);
         
         // o.material.map = arizona_height_texture;
         // o.material.map.flipY = false;
@@ -559,7 +553,7 @@ function init()
     
     //** HDRI LOADER */
     const rgbeLoader = new RGBELoader(manager);
-    rgbeLoader.load('/hdri/spaceHdri.hdr', function(texture){
+    rgbeLoader.load('/hdri/spaceHdri-1.hdr', function(texture){
         texture.mapping = THREE.EquirectangularReflectionMapping;
         scene.background = texture;
         scene.enviroment = texture;
@@ -1034,7 +1028,6 @@ const tick = () =>
 
     // Render
     composer.render(delta);
-    //renderer.render(scene, camera);
     cssRenderer.render(cssScene, camera);
 
     // Call tick again on the next frame
@@ -1064,18 +1057,20 @@ function animate()
     if ( mixer ) mixer.update( delta );
 
     //renderer.render( scene, camera );
-    composer.render(delta);
-    //cssRenderer.render(cssScene, camera);
+    // composer.render(delta);
+    // cssRenderer.render(cssScene, camera);
     //console.log(camera.position);
 
     //Video Textures
     tallVideoTexture.needsUpdate = true;
     squareVideoTexture.needsUpdate = true;
 
-    //console.log("Scene polycount:", renderer.info.render.triangles)
-    //console.log("Active Drawcalls:", renderer.info.render.calls)
-    //console.log("Textures in Memory", renderer.info.memory.textures)
-    //console.log("Geometries in Memory", renderer.info.memory.geometries)
+    console.log("Active Drawcalls:", renderer.info.render.calls)
+    renderer.info.autoReset = false;
+    renderer.info.reset();
+    // console.log("Scene polycount:", renderer.info.render.triangles)
+    // console.log("Textures in Memory", renderer.info.memory.textures)
+    // console.log("Geometries in Memory", renderer.info.memory.geometries)
 
     if(RESOURCES_LOADED)
     {
