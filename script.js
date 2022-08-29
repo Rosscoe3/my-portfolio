@@ -121,7 +121,7 @@ effectPixel.uniforms[ 'pixelSize' ].value = 3;
 
 const shaderFXAA = FXAAShader;
 const effectFXAA = new ShaderPass(shaderFXAA);
-var pixelRatio = renderer.getPixelRatio() * 5;
+var pixelRatio = renderer.getPixelRatio() * 7;
 effectFXAA.material.uniforms[ 'resolution' ].value.x = 1 / ( canvas.offsetWidth * pixelRatio );
 effectFXAA.material.uniforms[ 'resolution' ].value.y = 1 / ( canvas.offsetHeight * pixelRatio );
 
@@ -129,7 +129,7 @@ const smaaPass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), win
 
 composer.addPass(new RenderPass(scene, camera));
 composer.addPass(effectFXAA);
-composer.addPass(new UnrealBloomPass({x: 1024, y: 1024}, 0.5, 0.0, 0.9));
+//composer.addPass(new UnrealBloomPass({x: 1024, y: 1024}, 0.5, 0.0, 0.9));
 composer.addPass(filmPass);
 composer.addPass(effectVignette);
 
@@ -179,18 +179,18 @@ manager.onLoad = function () {
   introText.classList.toggle("active");
 };
 manager.onProgress = function (url, itemsLoaded, itemsTotal) {
-  // console.log(
-  //   "Loading file: " +
-  //     url +
-  //     ".\nLoaded " +
-  //     itemsLoaded +
-  //     " of " +
-  //     itemsTotal +
-  //     " files."
-  // );
+  console.log(
+    "Loading file: " +
+      url +
+      ".\nLoaded " +
+      itemsLoaded +
+      " of " +
+      itemsTotal +
+      " files."
+  );
 
   var progress = (itemsLoaded/41) * 100;
-  console.log("Progress: " + progress);
+  //console.log("Progress: " + progress);
 
   //Prevent from going over 100%
   if (progress > 100.0) {
@@ -439,7 +439,7 @@ function init()
             }
         });
     });
-    loader.load( '/models/Space-dreams-portfolio-update-7.glb', function ( gltf ) {
+    loader.load( '/models/Space-dreams-portfolio-update-9.glb', function ( gltf ) {
         //scene.add(gltf.scene);
 
         gltf.animations; // Array<THREE.AnimationClip>
@@ -460,14 +460,6 @@ function init()
     {
       if (o.isMesh)
       {
-        //o.material.normalScale = {x: .000001, y: .000001};
-        //o.material.bumpscale = .1;
-        //o.material.normalMapType = 0;
-        //console.log("O:" + o.name);
-        
-        // o.material.map = arizona_height_texture;
-        // o.material.map.flipY = false;
-        // console.log( o.material );
 
         if(o.name == "Mug")
         {
@@ -576,13 +568,6 @@ function init()
 	youtubeVid2.add(ytVid2);
     cssScene.add( youtubeVid2 );
 
-    // add it to the css scene
-    
-    //cssObject.position.set(portfolioScreen.position);
-    //cssObject.rotation.set(portfolioScreen.rotation);
-    //cssScene.add(cssObject);
-
-    //scene.add(focusBox);
     focusBox.scale.set(0.1, 0.1, 0.1);
     renderer.domElement.addEventListener("click", onclick, true);
 
@@ -1016,14 +1001,6 @@ const tick = () =>
     }
 
     sphereMesh.rotateY(10);
-
-    var pointAt = curve.getPointAt(t, v);
-
-    //console.log(curve.getPointAt(t, v))
-
-    //icyPlanet.position.copy(curve.getPointAt(t, v));
-    //icyPlanetClouds.position.applyMatrix4(orbit1.matrixWorld);
-    // Update Orbital Controls
     controls.update()
 
     // Render
@@ -1031,20 +1008,7 @@ const tick = () =>
     cssRenderer.render(cssScene, camera);
 
     // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
-    
-    //var planet1_Pos = orbit1.getPoint(orbit1Index / 10000);
-
-    // icyPlanet.position.x = planet1_Pos.x;
-    // icyPlanet.position.y = planet1_Pos.y;
-    // icyPlanet.position.z = planet1_Pos.z;
-
-    var offset = new THREE.Vector3(2, 0, 2);
-    //var newTargetPos = icyPlanet.position.add(offset)
-
-    //console.log
-
-    //camera.position.lerp(newTargetPos, .005);
+    window.requestAnimationFrame(tick);
 }
 function animate()
 {
@@ -1070,7 +1034,7 @@ function animate()
     renderer.info.reset();
     // console.log("Scene polycount:", renderer.info.render.triangles)
     // console.log("Textures in Memory", renderer.info.memory.textures)
-    // console.log("Geometries in Memory", renderer.info.memory.geometries)
+    //console.log("Geometries in Memory", renderer.info.memory.geometries)
 
     if(RESOURCES_LOADED)
     {
