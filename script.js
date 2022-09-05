@@ -439,7 +439,7 @@ function init()
             }
         });
     });
-    loader.load( '/models/Space-dreams-portfolio-update-9.glb', function ( gltf ) {
+    loader.load( '/models/Space-dreams-portfolio-update-10.glb', function ( gltf ) {
         //scene.add(gltf.scene);
 
         gltf.animations; // Array<THREE.AnimationClip>
