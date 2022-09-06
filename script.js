@@ -344,10 +344,7 @@ function init()
     // camera.position.y = 0.44;
     // camera.position.z = -2.4;
     camera.position.set( -0.255, 0.83, -1.83 );
-    //scene.add(camera);
-
     cssRenderer.setSize(sizes.width, sizes.height);
-    //document.body.appendChild(cssRenderer.domElement);
 
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -355,18 +352,11 @@ function init()
     renderer.toneMappingExposure = 3;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
-    //controls.target.y = 1;
-    //controls.target = icyPlanet.position;
-
-    //console.log(points[0])
-
     //** LIGHTS */
-    //scene.add(hemisphereLight);
     directionalLight.target = new THREE.Object3D( 100, 1, -30 );
     scene.add( directionalLight );
 
     //** ABOUT CLICKABLE LINKS */
-
     resumeBox.name = 'resume';
     artStationBox.name = 'photo';
     linkedInBox.name = 'creative technologist';
@@ -425,7 +415,7 @@ function init()
         var model = gltf.scene;
         icyPlanetClouds = model.children[0].children[0];
         icyPlanetClouds.scale.set(1.01, 1.01, 1.01);
-        console.log(model.children[0].children[0].scale);
+        //console.log(model.children[0].children[0].scale);
         
         model.traverse((o) => {
             if (o.isMesh)
@@ -469,7 +459,7 @@ function init()
         }
         else if (o.name == "SCREEN-FRAME")
         {
-            console.log(o.children);
+            //console.log(o.children);
             screenFrame = o;
             o.children[0].material = squareMovieMaterial;
             o.children[0].material.map.flipY = false;
@@ -477,7 +467,7 @@ function init()
         //** COFFEE SCREEN */
         else if (o.name == "SCREEN-FRAME-2")
         {
-            console.log(o.children);
+            //console.log(o.children);
             o.children[0].material = tallMovieMaterial;
             o.children[0].material.map.flipY = false;
         }
@@ -487,12 +477,12 @@ function init()
             // o.children[0].material = tallMovieMaterial;
             // o.children[0].material.map.flipY = false;
             portfolioScreen = o;
-            console.log(o.position);
+            //console.log(o.position);
         }
         //** ABOUT SCREEN */
         else if (o.name == "SCREEN-FRAME-2001")
         {
-            console.log(o.children);
+            //console.log(o.children);
             aboutScreen = o;
             o.children[0].material = aboutMovieMaterial;
             o.children[0].material.map.flipY = false;
@@ -502,7 +492,7 @@ function init()
         else if(o.name == "Sphere")
         {
             planetHologram = o;
-            console.log(planetHologram);
+            //console.log(planetHologram);
 
             planetHologramChild = planetHologram.children[0];
             planetHologramChild2 = planetHologram.children[1];
@@ -549,7 +539,7 @@ function init()
         texture.mapping = THREE.EquirectangularReflectionMapping;
         scene.background = texture;
         scene.enviroment = texture;
-        console.log("LOADED IMAGE");
+        //console.log("LOADED IMAGE");
     });
 
     //** YOUTUBE VIDEO POSITION */
@@ -759,7 +749,7 @@ function lessonCameraMove(index)
 
 function cameraMoveComplete()
 {
-    console.log("TWEEN IS DONE");
+    //console.log("TWEEN IS DONE");
 
     if(!controls.enabled)
     {
@@ -844,7 +834,7 @@ function hoverObject() {
             intersected = true;
             intersectObject.material.opacity = 0.5;
             intersectObject.material.side = THREE.FrontSide;
-            console.log("On Object");
+            //console.log("On Object");
             document.body.style.cursor = 'pointer' 
         }
         else if(intersects[0].object.name == "Clouds-icyPlanet001")
@@ -859,11 +849,11 @@ function hoverObject() {
         {
             if (intersected) 
             {
-                console.log("Off Object");
+                //console.log("Off Object");
                 document.body.style.cursor = 'default'
                 intersected = false;
                 intersectObject.material.opacity = 0;
-                console.log(intersectObject);
+                //console.log(intersectObject);
                 intersectObject = null;
             }
         }
@@ -879,7 +869,7 @@ function clickEvent() {
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(scene.children, true);
 
-    console.log(intersects[0]);
+    //console.log(intersects[0]);
 
     if(intro)
     {
@@ -897,7 +887,7 @@ function clickEvent() {
             intersects[0].object.name == "contact" || intersects[0].object.name == "blender" || 
             intersects[0].object.name == "unity")
             {
-                console.log("clicked about link");
+                //console.log("clicked about link");
                 clickOpenURL(intersects, intersects[0].object.userdata);
             }
             else if(intersects.length > 0 && intersects[0].object.name == "Clouds-icyPlanet001")
@@ -949,16 +939,16 @@ function clickOpenURL(intersects, url)
 {
     if (intersects.length > 0) 
     {
-        console.log("CLICK OPEN");
+        //console.log("CLICK OPEN");
         //If it has a URL open in another window
         if (url) 
         {
             window.open(url,'_blank');
-            console.log("Opening: " + url + " in a new tab");
+            //console.log("Opening: " + url + " in a new tab");
         } 
         else 
         {
-            console.log("UI does not have a link");
+            //console.log("UI does not have a link");
         }
     }
 }
@@ -1029,7 +1019,7 @@ function animate()
     tallVideoTexture.needsUpdate = true;
     squareVideoTexture.needsUpdate = true;
 
-    console.log("Active Drawcalls:", renderer.info.render.calls)
+    //console.log("Active Drawcalls:", renderer.info.render.calls)
     renderer.info.autoReset = false;
     renderer.info.reset();
     // console.log("Scene polycount:", renderer.info.render.triangles)
@@ -1106,7 +1096,7 @@ document.addEventListener( 'mouseup', function () {
 } );
 
 document.addEventListener('touchstart', function (event) {
-    console.log("touchStart");
+    //console.log("touchStart");
     if(intro)
     {
         intro = false;
@@ -1117,7 +1107,7 @@ document.addEventListener('touchstart', function (event) {
     onclick(event);
 });
 document.addEventListener('touchend', function (event) {
-    console.log("touchEND");
+    //console.log("touchEND");
     onclick(event);
 });
 
@@ -1151,7 +1141,7 @@ window.addEventListener("click", () => {
 
 titleButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
-    console.log("PORTFOIO");
+    //console.log("PORTFOIO");
   
     lessonCameraMove(1);
 
@@ -1172,7 +1162,7 @@ titleButton.addEventListener("click", function (ev) {
 
 animationButton.addEventListener("click", function (ev) {
   ev.stopPropagation(); // prevent event from bubbling up to .container
-  console.log("ANIMATION");
+  //console.log("ANIMATION");
 
   if(!document.getElementById("animationYoutubeVideo").classList.contains("active"))
   {
@@ -1193,7 +1183,7 @@ animationButton.addEventListener("click", function (ev) {
 
 interactivesButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
-    console.log("INTERACTIVE");
+    //console.log("INTERACTIVE");
     if(!document.getElementById("interactiveYoutubeVideo").classList.contains("active"))
     {
     document.getElementById("interactiveYoutubeVideo").classList.toggle("active");
@@ -1208,7 +1198,7 @@ interactivesButton.addEventListener("click", function (ev) {
 
 aboutButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
-    console.log("ABOUT");
+    //console.log("ABOUT");
 
     if(introText.classList.contains("active"))
     {
@@ -1224,7 +1214,7 @@ aboutButton.addEventListener("click", function (ev) {
 
 blackAndWhiteButton.addEventListener("click", function (ev) {
     ev.stopPropagation(); // prevent event from bubbling up to .container
-    console.log("BLACK &  WHITE");
+    //console.log("BLACK &  WHITE");
     composer.removePass(filmPass);
 
     if(grayscale)
